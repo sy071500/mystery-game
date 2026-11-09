@@ -2,529 +2,748 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Gothic+Coding:wght@400;700&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Nanum+Gothic+Coding:wght@400;700&family=Nanum+Pen+Script&family=Noto+Serif+KR:wght@400;600;700;900&display=swap">
 <style>
-/* Layout: 한밤의 책상 위에 펼친 사건 파일. 왼쪽 색인 탭(장소·인물) / 가운데 현장 평면도·심문 / 오른쪽 단서 보드와 붉은 실 */
+/* Layout: 한밤의 책상 위 사건 파일. 왼쪽 색인 탭(장소·관계자) / 가운데 현장 도면·심문 / 오른쪽 코르크 단서 보드. 추리쇼는 전체 화면 무대 */
 :root{
-  --desk:#151b27;
-  --desk-hi:#1f2737;
-  --line:#2d374a;
-  --paper:#ebe5d6;
-  --paper-edge:#cdc4ae;
-  --manila:#d3b775;
-  --ink:#23262d;
-  --ink-soft:#5b5f69;
+  --desk:#131925;
+  --desk-hi:#1c2433;
+  --line:#2c3648;
+  --paper:#ece6d6;
+  --paper-2:#f5f1e6;
+  --paper-edge:#cbc1a8;
+  --manila:#cfb170;
+  --ink:#232831;
+  --ink-soft:#5a5f69;
   --red:#c4372d;
   --lamp:#f0c25a;
   --muted:#8f99ac;
-  --chalk:#dfe6f2;
+  --chalk:#e0e6f0;
   --f-display:"Black Han Sans","Noto Sans KR","Apple SD Gothic Neo",sans-serif;
   --f-body:"Noto Serif KR","Nanum Myeongjo",serif;
   --f-hand:"Nanum Pen Script","Noto Serif KR",cursive;
   --f-mono:"Nanum Gothic Coding","D2Coding",ui-monospace,monospace;
+  --grain:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{min-height:100%}
 body{
   background:
-    radial-gradient(1200px 700px at 12% -10%, rgba(240,194,90,.13), transparent 60%),
+    radial-gradient(900px 600px at 18% -8%, rgba(240,194,90,.16), transparent 62%),
+    radial-gradient(1200px 800px at 110% 120%, rgba(0,0,0,.5), transparent 60%),
     var(--desk);
-  color:var(--chalk);
-  font-family:var(--f-body);
-  font-size:15px;
-  line-height:1.6;
+  color:var(--chalk);font-family:var(--f-body);font-size:15px;line-height:1.6;
   padding-left:max(16px, env(safe-area-inset-left, 0px));
   padding-right:max(16px, env(safe-area-inset-right, 0px));
-  padding-block:20px 40px;
+  padding-block:22px 44px;
 }
+body::after{content:"";position:fixed;inset:0;pointer-events:none;background:var(--grain);opacity:.6;mix-blend-mode:overlay;z-index:0}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--lamp);outline-offset:3px}
+.paper{background-color:var(--paper);background-image:var(--grain);color:var(--ink)}
 
-.app{max-width:1320px;margin:0 auto;display:grid;gap:20px;
-  grid-template-columns:210px minmax(0,1fr) 360px;
+.app{position:relative;z-index:1;max-width:1340px;margin:0 auto;display:grid;gap:22px;
+  grid-template-columns:200px minmax(0,1fr) 360px;
   grid-template-areas:"head head head" "side main board";}
-@media (max-width:1080px){.app{grid-template-columns:200px minmax(0,1fr);grid-template-areas:"head head" "side main" "board board"}}
+@media (max-width:1100px){.app{grid-template-columns:190px minmax(0,1fr);grid-template-areas:"head head" "side main" "board board"}}
 @media (max-width:720px){.app{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "side" "main" "board"}}
 
-/* 헤더: 사건 파일 표지 */
-.head{grid-area:head;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;
-  border-bottom:1px dashed var(--line);padding-bottom:16px}
-.file-no{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
-.head h1{font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4vw,40px);line-height:1.15;margin:4px 0 0;text-wrap:balance;color:var(--paper)}
+/* 헤더 */
+.head{grid-area:head;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:14px 24px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.folder-tab{display:inline-flex;gap:10px;align-items:center;background:var(--manila);color:var(--ink);font-family:var(--f-mono);font-size:12px;font-weight:700;
+  letter-spacing:.12em;padding:4px 14px 4px 12px;border-radius:3px 12px 0 0;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.folder-tab i{font-style:normal;color:var(--red)}
+.head h1{font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.4vw,46px);line-height:1.1;margin:10px 0 0;text-wrap:balance;color:var(--paper);letter-spacing:-.01em}
 .head h1 em{font-style:normal;color:var(--lamp)}
-.head-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-.count{font-family:var(--f-mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
-.count b{color:var(--paper);font-size:18px}
-.stamp{font-family:var(--f-display);color:var(--red);border:3px solid var(--red);padding:2px 10px;transform:rotate(-6deg);
-  letter-spacing:.1em;font-size:18px;opacity:.9;border-radius:4px}
-.mock-note{width:100%;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.head .sub{font-size:13.5px;color:var(--muted);margin-top:6px}
+.head-right{display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right;line-height:1.3}
+.count b{display:block;color:var(--paper);font-size:24px;font-family:var(--f-display);font-weight:400}
+.stamp{font-family:var(--f-display);color:var(--red);border:3px double var(--red);padding:3px 12px;transform:rotate(-7deg);letter-spacing:.14em;font-size:19px;opacity:.85;border-radius:4px}
 
-/* 사이드: 색인 탭 */
-.side{grid-area:side;display:flex;flex-direction:column;gap:22px;min-width:0}
-.side h2,.board h2{font-family:var(--f-mono);font-size:12px;font-weight:700;letter-spacing:.16em;color:var(--muted);margin:0 0 8px;text-transform:uppercase}
+/* 사이드 */
+.side{grid-area:side;display:flex;flex-direction:column;gap:24px;min-width:0}
+.cap{font-family:var(--f-mono);font-size:11.5px;font-weight:700;letter-spacing:.18em;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.cap::after{content:"";flex:1;height:1px;background:var(--line)}
 .tabs{display:flex;flex-direction:column;gap:6px}
 @media (max-width:720px){.tabs{flex-direction:row;flex-wrap:wrap}}
-.tab{background:var(--manila);color:var(--ink);border:0;text-align:left;padding:8px 12px;border-radius:2px 10px 10px 2px;
-  font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px;
-  box-shadow:inset 3px 0 0 rgba(0,0,0,.15);transition:transform .15s}
-.tab:hover{transform:translateX(3px)}
-.tab[aria-current="true"]{background:var(--paper);box-shadow:inset 4px 0 0 var(--red)}
-.tab.locked{background:#3a4253;color:var(--muted)}
-.tab small{font-family:var(--f-mono);font-size:11px;font-weight:400;opacity:.75}
-.people{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tab{background:var(--manila);background-image:var(--grain);color:var(--ink);border:0;text-align:left;padding:9px 12px 9px 14px;border-radius:2px 12px 12px 2px;
+  font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:10px;box-shadow:0 2px 0 rgba(0,0,0,.25);transition:transform .15s}
+.tab:hover{transform:translateX(4px)}
+.tab[aria-current="true"]{background-color:var(--paper-2);box-shadow:inset 4px 0 0 var(--red),0 2px 0 rgba(0,0,0,.25)}
+.tab.locked{background-color:#343c4c;color:var(--muted)}
+.tab small{font-family:var(--f-mono);font-size:11px;font-weight:400;opacity:.8}
+.people{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media (max-width:720px){.people{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.person{background:none;border:0;padding:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
-.person .ph{width:100%;max-width:88px;aspect-ratio:1;border-radius:4px;overflow:hidden;background:var(--paper);
-  border:3px solid var(--paper);box-shadow:0 4px 10px rgba(0,0,0,.4);transition:transform .15s}
-.person:hover .ph{transform:rotate(-3deg) scale(1.04)}
-.person[aria-current="true"] .ph{border-color:var(--lamp)}
-.person span{font-size:13px;font-weight:600;line-height:1.2}
+.person{background:none;border:0;padding:0;text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px}
+.person .ph{width:100%;max-width:90px;aspect-ratio:6/7;overflow:hidden;background:var(--paper-2);padding:4px 4px 0;
+  box-shadow:0 6px 14px rgba(0,0,0,.45);transition:transform .18s}
+.person .ph svg{display:block;width:100%;height:100%}
+.person:hover .ph{transform:rotate(-3deg) translateY(-2px)}
+.person[aria-current="true"] .ph{outline:3px solid var(--lamp);outline-offset:2px}
+.person span{font-size:13.5px;font-weight:700;line-height:1.2}
 .person small{font-family:var(--f-mono);font-size:10.5px;color:var(--muted);line-height:1.2}
 
-/* 메인 패널 */
-.main{grid-area:main;min-width:0;background:var(--desk-hi);border:1px solid var(--line);border-radius:6px;padding:18px;display:flex;flex-direction:column;gap:14px}
-.main-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-.main-head h2{font-family:var(--f-display);font-weight:400;font-size:22px;margin:0;color:var(--paper)}
+/* 메인 */
+.main{grid-area:main;min-width:0;display:flex;flex-direction:column;gap:14px}
+.main-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.main-head h2{font-family:var(--f-display);font-weight:400;font-size:24px;margin:0;color:var(--paper)}
 .hint{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
-.btn{background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 12px;font-size:13px}
+.btn{background:transparent;border:1px solid var(--line);border-radius:3px;padding:7px 14px;font-size:13px}
 .btn:hover{border-color:var(--muted)}
-.btn-red{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--f-display);font-size:17px;padding:10px 18px;letter-spacing:.04em}
-.btn-red:hover{filter:brightness(1.1)}
+.btn-red{background:var(--red);border-color:var(--red);color:#fff;font-family:var(--f-display);font-size:18px;padding:11px 20px;letter-spacing:.04em;box-shadow:0 4px 0 #7d1f18}
+.btn-red:hover{filter:brightness(1.08)}
+.btn-red:active{transform:translateY(2px);box-shadow:0 2px 0 #7d1f18}
 
-/* 평면도 */
-.plan-wrap{background:#0f1520;border-radius:4px;position:relative;
-  background-image:linear-gradient(rgba(143,153,172,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(143,153,172,.07) 1px,transparent 1px);
-  background-size:24px 24px}
+/* 현장 도면 */
+.sheet{position:relative;padding:10px;box-shadow:0 14px 30px rgba(0,0,0,.5),0 1px 0 var(--paper-edge);transform:rotate(-.4deg)}
+.sheet::before{content:"";position:absolute;top:-12px;left:28px;width:16px;height:44px;border:3px solid #9aa4b5;border-radius:9px;border-bottom-color:transparent;z-index:2}
 .plan{display:block;width:100%;height:auto}
-.plan .wall{fill:none;stroke:var(--chalk);stroke-width:6}
-.plan .thin{fill:none;stroke:var(--muted);stroke-width:1.5}
-.plan .fur{fill:rgba(223,230,242,.06);stroke:var(--muted);stroke-width:1.5}
-.plan .label{fill:var(--muted);font-family:var(--f-mono);font-size:12px}
-.plan .body-outline{fill:none;stroke:var(--chalk);stroke-width:2;stroke-dasharray:6 5}
-.plan .fire{fill:var(--line);stroke:var(--muted)}
-.hot{cursor:pointer}
-.hot circle.dot{fill:var(--lamp)}
-.hot circle.ring{fill:none;stroke:var(--lamp);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:pulse 2s ease-out infinite}
-.hot.done circle.dot{fill:var(--muted)}
-.hot.done circle.ring{display:none}
-.hot.lock circle.dot{fill:var(--red)}
-.hot text{fill:var(--paper);font-family:var(--f-body);font-size:13px;font-weight:600;paint-order:stroke;stroke:#0f1520;stroke-width:4px}
-.hot:focus{outline:none}
-.hot:focus-visible circle.dot{stroke:#fff;stroke-width:3}
-@keyframes pulse{0%{transform:scale(.6);opacity:1}100%{transform:scale(1.9);opacity:0}}
+.plan .ink{fill:none;stroke:var(--ink);stroke-width:1.6}
+.plan .fill{fill:var(--paper-2);stroke:var(--ink);stroke-width:1.6}
+.plan .soft{fill:none;stroke:var(--ink);stroke-width:1;opacity:.45}
+.plan .lab{fill:var(--ink-soft);font-family:var(--f-mono);font-size:11px}
+.plan .lab-b{fill:var(--ink);font-family:var(--f-body);font-size:12px;font-weight:700}
+.plan .tape{fill:rgba(196,55,45,.06);stroke:var(--red);stroke-width:2;stroke-dasharray:7 4}
+.mk{cursor:pointer}
+.mk .tent{fill:#f2c230;stroke:#1d1d1d;stroke-width:1.4}
+.mk .num{fill:#1d1d1d;font-family:var(--f-display);font-size:13px;text-anchor:middle}
+.mk .halo{fill:none;stroke:#f2c230;stroke-width:2.5;transform-box:fill-box;transform-origin:center;animation:pulse 2.2s ease-out infinite}
+.mk.done .tent{fill:#cfc8b6}
+.mk.done .halo{display:none}
+.mk.lock .tent{fill:#d4473a}
+.mk.lock .num{fill:#fff}
+.mk .tag{fill:var(--ink);font-family:var(--f-body);font-size:12.5px;font-weight:700;paint-order:stroke;stroke:var(--paper-2);stroke-width:4px}
+.mk:hover .tent{filter:brightness(1.1)}
+.mk:focus{outline:none}
+.mk:focus-visible .tent{stroke:var(--red);stroke-width:3}
+@keyframes pulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(2);opacity:0}}
 
 /* 심문 */
-.interro{display:grid;grid-template-columns:minmax(120px,200px) minmax(0,1fr);gap:18px;align-items:start}
-@media (max-width:520px){.interro{grid-template-columns:minmax(0,1fr)}}
-.big-ph{width:100%;max-width:200px;aspect-ratio:1;background:var(--paper);border:5px solid var(--paper);box-shadow:0 8px 20px rgba(0,0,0,.45);transform:rotate(-2deg)}
-.big-ph.shake{animation:shake .35s}
-@keyframes shake{20%{transform:translateX(-6px) rotate(-3deg)}40%{transform:translateX(6px) rotate(-1deg)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.interro{display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:540px){.interro{grid-template-columns:minmax(0,1fr)}}
+.idcard{padding:8px 8px 12px;box-shadow:0 12px 26px rgba(0,0,0,.5);transform:rotate(-2deg);max-width:220px}
+.idcard .pic{aspect-ratio:6/7;overflow:hidden;background:#cfd5de}
+.idcard .pic svg{display:block;width:100%;height:100%}
+.idcard .nm{font-family:var(--f-display);font-size:22px;margin-top:8px;line-height:1.1}
+.idcard .rl{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-soft)}
+.idcard.shake{animation:shake .38s}
+@keyframes shake{20%{transform:translateX(-7px) rotate(-3deg)}40%{transform:translateX(7px) rotate(-1deg)}60%{transform:translateX(-4px) rotate(-2deg)}80%{transform:translateX(3px) rotate(-2deg)}}
 .talk{display:flex;flex-direction:column;gap:12px;min-width:0}
-.who{font-family:var(--f-display);font-size:24px;color:var(--paper);line-height:1.1}
-.who small{display:block;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:4px}
-.bubble{background:var(--paper);color:var(--ink);padding:14px 16px;border-radius:2px;position:relative;font-size:16px;line-height:1.7;min-height:90px;
-  box-shadow:0 3px 0 var(--paper-edge)}
-.bubble.new::after{content:"새 진술";position:absolute;top:-10px;right:10px;background:var(--red);color:#fff;font-family:var(--f-mono);font-size:11px;padding:1px 8px;border-radius:2px}
-.row-label{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:.1em}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{background:transparent;border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:13px}
+.bubble{position:relative;padding:18px 18px 16px;font-size:16.5px;line-height:1.75;min-height:110px;box-shadow:0 8px 18px rgba(0,0,0,.35)}
+.bubble .speaker{position:absolute;top:-12px;left:14px;background:var(--ink);color:var(--paper);font-family:var(--f-mono);font-size:11.5px;padding:2px 10px;letter-spacing:.08em}
+.bubble.new::after{content:"새 진술 기록";position:absolute;top:-12px;right:12px;background:var(--red);color:#fff;font-family:var(--f-mono);font-size:11px;padding:2px 9px}
+.row-label{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:.12em;margin-top:4px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:13.5px}
 .chip:hover{border-color:var(--lamp);color:var(--lamp)}
 .chip.ev{border-style:dashed}
 .empty{font-size:13px;color:var(--muted)}
 
-/* 단서 보드 */
-.board{grid-area:board;min-width:0;display:flex;flex-direction:column;gap:10px}
-.cork{position:relative;min-height:320px;border-radius:6px;padding:18px 14px 22px;
-  background:#2a2f3a;
-  background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1.5px);background-size:9px 9px;
-  border:1px solid var(--line);
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px 14px;align-content:start}
-.threads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
-.threads line{stroke:var(--red);stroke-width:2;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5))}
-.card{position:relative;z-index:1;background:var(--paper);color:var(--ink);padding:8px 8px 10px;box-shadow:0 6px 14px rgba(0,0,0,.45);
-  transform:rotate(var(--r,0deg));transition:transform .2s}
-.card:hover{transform:rotate(0) scale(1.03);z-index:3}
-.card::before{content:"";position:absolute;top:-6px;left:50%;width:12px;height:12px;margin-left:-6px;border-radius:50%;
-  background:var(--red);box-shadow:inset -2px -2px 0 rgba(0,0,0,.25),0 2px 2px rgba(0,0,0,.4);z-index:4}
-.card .photo{background:#cfd5de;aspect-ratio:4/3;display:grid;place-items:center;color:#2f3a4d;position:relative}
-.card .photo svg{width:46%;height:auto}
-.card .id{position:absolute;left:6px;top:4px;font-family:var(--f-mono);font-size:10.5px;font-weight:700;color:#2f3a4d}
-.card .tp{position:absolute;right:6px;top:4px;font-family:var(--f-mono);font-size:10.5px;color:var(--red);border:1px solid var(--red);padding:0 4px;border-radius:2px}
+/* 증거 카드 (폴라로이드) */
+.card{position:relative;z-index:1;background:var(--paper-2);background-image:var(--grain);color:var(--ink);padding:7px 7px 10px;
+  box-shadow:0 8px 16px rgba(0,0,0,.5);transform:rotate(var(--r,0deg));transition:transform .2s}
+.photo{position:relative;aspect-ratio:4/3;overflow:hidden;
+  background:radial-gradient(120% 90% at 40% 35%, #3b4456 0%, #1e2430 55%, #11151c 100%)}
+.photo svg{position:absolute;inset:0;width:100%;height:100%}
+.photo::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 50% at 35% 30%,rgba(255,255,255,.12),transparent 70%);pointer-events:none}
+.photo .evno{position:absolute;left:5px;bottom:5px;z-index:2;background:#f2c230;color:#1d1d1d;font-family:var(--f-mono);font-size:10px;font-weight:700;padding:0 5px}
+.photo .tp{position:absolute;right:5px;top:5px;z-index:2;font-family:var(--f-mono);font-size:10px;color:#fff;background:rgba(196,55,45,.85);padding:0 5px}
 .card h3{font-family:var(--f-body);font-weight:700;font-size:14px;margin:8px 2px 2px;line-height:1.3}
 .card p{font-size:12.5px;line-height:1.5;margin:0 2px;color:var(--ink-soft)}
-.card.note{background:#f3dc7a;padding:12px 12px 14px}
-.card.note h3{font-family:var(--f-hand);font-weight:400;font-size:22px;margin:0 0 2px}
+.card.note{background:#f1d873;background-image:var(--grain);padding:12px 12px 14px}
+.card.note h3{font-family:var(--f-hand);font-weight:400;font-size:23px;margin:0 0 2px}
 .card.note p{font-family:var(--f-hand);font-size:20px;line-height:1.2;color:#3d3520}
 .card.note .by{font-family:var(--f-mono);font-size:10.5px;color:#6b5d2f;display:block;margin-top:6px}
-.card.fresh{animation:pin .45s cubic-bezier(.2,1.4,.4,1)}
-@keyframes pin{from{transform:translateY(-30px) rotate(12deg) scale(1.15);opacity:0}}
-.cork-empty{grid-column:1/-1;font-family:var(--f-hand);font-size:24px;color:var(--muted);text-align:center;padding-top:60px}
 
+/* 단서 보드 */
+.board{grid-area:board;min-width:0;display:flex;flex-direction:column;gap:12px}
+.cork{position:relative;min-height:340px;border-radius:4px;padding:22px 14px 24px;
+  background:#5b4433;background-image:radial-gradient(rgba(0,0,0,.18) 1.2px,transparent 1.6px),radial-gradient(rgba(255,220,170,.10) 1px,transparent 1.4px),var(--grain);
+  background-size:7px 7px,11px 11px,auto;background-position:0 0,3px 5px,0 0;
+  box-shadow:inset 0 0 0 10px #2a211a,inset 0 0 40px rgba(0,0,0,.5);
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:20px 14px;align-content:start;padding-inline:22px}
+.cork .card::before{content:"";position:absolute;top:-7px;left:50%;width:13px;height:13px;margin-left:-6px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ef6a5f,var(--red) 55%,#7d1f18);box-shadow:0 3px 3px rgba(0,0,0,.45);z-index:4}
+.cork .card:hover{transform:rotate(0) scale(1.04);z-index:3}
+.threads{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2}
+.threads path{fill:none;stroke:#d63a2f;stroke-width:2.2;stroke-linecap:round;filter:drop-shadow(0 2px 1px rgba(0,0,0,.5))}
+.card.fresh{animation:pin .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pin{from{transform:translateY(-34px) rotate(14deg) scale(1.15);opacity:0}}
+.cork-empty{grid-column:1/-1;font-family:var(--f-hand);font-size:24px;color:#d8c3a8;text-align:center;padding-top:70px}
 .foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 
 /* 토스트 */
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;
-  background:var(--paper);color:var(--ink);padding:10px 18px;border-radius:3px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.5);
-  transition:.25s;z-index:50;max-width:calc(100vw - 32px)}
+  background:var(--paper-2);color:var(--ink);padding:10px 18px;font-weight:700;box-shadow:0 10px 28px rgba(0,0,0,.55);border-left:4px solid var(--red);
+  transition:.25s;z-index:200;max-width:calc(100vw - 32px)}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 추리쇼 */
-.show{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:hidden;
-  background:#07090e;padding:max(24px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+/* ===== 추리쇼 ===== */
+.show{position:fixed;inset:0;z-index:100;overflow-y:auto;background:#06080c;color:#fff;
+  padding:max(18px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
 .show[hidden]{display:none}
-.show::before{content:"";position:absolute;inset:-50%;
-  background:repeating-conic-gradient(from 0deg at 50% 50%, rgba(240,194,90,.10) 0deg 2deg, transparent 2deg 9deg);
-  animation:spin 60s linear infinite}
+.show::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(50% 45% at 50% 38%,rgba(240,194,90,.14),transparent 70%),var(--grain)}
+.show.hot::after{content:"";position:fixed;inset:-50%;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 50%,rgba(255,255,255,.06) 0 1.5deg,transparent 1.5deg 8deg);animation:spin 40s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.show-inner{position:relative;max-width:900px;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:28px;align-items:center}
-@media (max-width:640px){.show-inner{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}}
-.show-step{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;color:var(--lamp)}
-.show-line{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,6vw,64px);line-height:1.12;color:#fff;margin:8px 0 14px;text-wrap:balance;
-  text-shadow:4px 4px 0 var(--red)}
-.show-sub{font-size:clamp(15px,2vw,19px);color:var(--chalk);max-width:34em;margin:0}
-.show .card{width:200px;--r:6deg}
-.show .card.slam{animation:slam .5s cubic-bezier(.2,1.6,.4,1)}
-@keyframes slam{from{transform:scale(2.6) rotate(-20deg);opacity:0}}
-.show.quake .show-inner{animation:quake .4s}
-@keyframes quake{25%{transform:translate(-8px,4px)}50%{transform:translate(7px,-5px)}75%{transform:translate(-4px,2px)}}
-.show-ctrl{position:absolute;right:max(16px,env(safe-area-inset-right,0px));bottom:max(16px,env(safe-area-inset-bottom,0px));display:flex;gap:8px}
-.show-ctrl .btn{background:rgba(0,0,0,.5);border-color:#444c5c;color:#fff}
+.sw{position:relative;z-index:1;max-width:1000px;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100%}
+.s-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--f-mono);font-size:12px;color:var(--muted);letter-spacing:.12em}
+.s-top b{color:var(--lamp);font-weight:700}
+.hearts{display:flex;gap:4px;align-items:center}
+.hearts svg{width:22px;height:22px}
+.hearts .off{opacity:.18}
+.lineup{display:flex;justify-content:center;gap:clamp(8px,2vw,20px);flex-wrap:wrap}
+.lu{width:clamp(62px,11vw,96px);text-align:center;transition:opacity .3s,transform .3s;opacity:.38;filter:grayscale(.5)}
+.lu.on{opacity:1;filter:none;transform:translateY(-4px)}
+.lu .f{aspect-ratio:6/7;overflow:hidden;background:#cfd5de;border:3px solid #e6dfcf;box-shadow:0 6px 14px rgba(0,0,0,.6)}
+.lu .f svg{display:block;width:100%;height:100%}
+.lu.on .f{border-color:var(--lamp)}
+.lu.accused .f{border-color:var(--red)}
+.lu span{display:block;font-size:12.5px;font-weight:700;margin-top:4px}
+.stage{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-items:center;min-height:230px}
+.det{text-align:center;max-width:820px;margin:0 auto}
+.det .who{font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;color:var(--lamp)}
+.punch{font-family:var(--f-display);font-weight:400;font-size:clamp(30px,5.6vw,60px);line-height:1.12;margin:8px 0 12px;text-wrap:balance;text-shadow:4px 4px 0 var(--red),0 0 30px rgba(196,55,45,.35)}
+.punch.in{animation:punch .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes punch{from{transform:scale(1.6);opacity:0;letter-spacing:.2em}}
+.det p{font-size:clamp(15px,1.8vw,18px);color:var(--chalk);margin:0 auto;max-width:40em}
+.obj{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:20px;align-items:center;max-width:820px;margin:0 auto;width:100%}
+@media (max-width:560px){.obj{grid-template-columns:96px minmax(0,1fr);gap:14px}}
+.obj .f{aspect-ratio:6/7;overflow:hidden;background:#cfd5de;border:4px solid #e6dfcf;box-shadow:0 10px 24px rgba(0,0,0,.6);transform:rotate(-2deg)}
+.obj .f svg{display:block;width:100%;height:100%}
+.obj .f.shake{animation:shake .4s}
+.say{position:relative;padding:18px 20px;font-size:clamp(16px,2vw,19px);line-height:1.7;box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.say .speaker{position:absolute;top:-12px;left:16px;background:var(--red);color:#fff;font-family:var(--f-mono);font-size:12px;padding:2px 10px;letter-spacing:.08em}
+.proof{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:28px;align-items:center;max-width:900px;margin:0 auto}
+@media (max-width:640px){.proof{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center}}
+.proof .card{width:190px;--r:5deg}
+.proof .card.slam{animation:slam .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes slam{from{transform:scale(2.4) rotate(-22deg);opacity:0}}
+.seal{position:absolute;right:-14px;bottom:-14px;z-index:5;width:78px;height:78px;border-radius:50%;border:4px solid var(--red);color:var(--red);
+  display:grid;place-items:center;font-family:var(--f-display);font-size:22px;transform:rotate(-14deg);background:rgba(245,241,230,.85);animation:seal .35s .25s both cubic-bezier(.2,1.6,.4,1)}
+@keyframes seal{from{transform:scale(2.2) rotate(-30deg);opacity:0}}
+.act{background:rgba(236,230,214,.06);border:1px solid #2a3140;border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:12px}
+.act-q{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.act-q strong{font-family:var(--f-display);font-weight:400;font-size:20px;color:var(--lamp)}
+.act-q span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tray{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 10px;scroll-snap-type:x proximity}
+.ev{flex:0 0 112px;scroll-snap-align:start;background:var(--paper-2);color:var(--ink);border:0;padding:5px 5px 7px;text-align:left;box-shadow:0 4px 10px rgba(0,0,0,.5);transition:transform .15s}
+.ev:hover{transform:translateY(-4px)}
+.ev[aria-pressed="true"]{outline:3px solid var(--lamp);outline-offset:2px;transform:translateY(-6px)}
+.ev .photo{aspect-ratio:4/3}
+.ev.note-ev{background:#f1d873}
+.ev.note-ev .photo{background:none;display:grid;place-items:center;font-family:var(--f-hand);font-size:22px;color:#3d3520;line-height:1}
+.ev b{display:block;font-size:12px;line-height:1.3;margin-top:5px}
+.act-row{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.accuse{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,2vw,22px);max-width:760px;margin:0 auto;width:100%}
+@media (max-width:520px){.accuse{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ac{background:none;border:0;padding:0;color:#fff;text-align:center}
+.ac .f{aspect-ratio:6/7;overflow:hidden;background:#cfd5de;border:4px solid #e6dfcf;box-shadow:0 10px 22px rgba(0,0,0,.6);transition:transform .18s,border-color .18s}
+.ac .f svg{display:block;width:100%;height:100%}
+.ac:hover .f,.ac:focus-visible .f{transform:translateY(-6px) rotate(-2deg);border-color:var(--red)}
+.ac b{display:block;font-family:var(--f-display);font-weight:400;font-size:19px;margin-top:8px}
+.ac small{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+.ending{text-align:center;max-width:640px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px}
+.grade{width:130px;height:130px;border-radius:50%;border:6px double var(--red);color:var(--red);display:grid;place-items:center;font-family:var(--f-display);font-size:64px;
+  transform:rotate(-10deg);background:rgba(245,241,230,.92);animation:seal .45s cubic-bezier(.2,1.6,.4,1)}
+.sum{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;text-align:left;padding:16px 18px;box-shadow:0 10px 24px rgba(0,0,0,.5)}
+.sum dt{font-family:var(--f-mono);font-size:12px;color:var(--ink-soft);padding-top:2px}
+.sum dd{margin:0;font-weight:700}
+.shk{animation:quake .38s}
+@keyframes quake{25%{transform:translate(-9px,4px)}50%{transform:translate(8px,-5px)}75%{transform:translate(-4px,2px)}}
 
-@media (prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important}
-}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 
 <div class="app">
   <header class="head">
     <div>
-      <div class="file-no">사건 파일 No.01 · 강원도 설월장</div>
+      <span class="folder-tab">사건 파일 <i>No.01</i> 강원도 설월장</span>
       <h1>설월장의 <em>마지막 목소리</em></h1>
+      <div class="sub">아트 방향 시안 · 서재를 조사하고 관계자를 심문한 뒤, 추리쇼에서 범인을 찾아보세요.</div>
     </div>
     <div class="head-right">
-      <div class="count">획득 단서 <b id="cnt">0</b> / 26</div>
+      <div class="count">획득 단서<b><span id="cnt">0</span> / 26</b></div>
       <div class="stamp" aria-hidden="true">수사중</div>
     </div>
-    <div class="mock-note">아트 방향 시안 · 수사 파일 스타일 · 이 시안에서는 서재 조사와 심문, 추리쇼 미리보기를 해 볼 수 있어요</div>
   </header>
 
   <aside class="side">
-    <section>
-      <h2>장소</h2>
-      <div class="tabs" id="places"></div>
-    </section>
-    <section>
-      <h2>관계자</h2>
-      <div class="people" id="people"></div>
-    </section>
+    <section><h2 class="cap">장소</h2><div class="tabs" id="places"></div></section>
+    <section><h2 class="cap">관계자</h2><div class="people" id="people"></div></section>
   </aside>
 
   <main class="main" id="main"></main>
 
   <section class="board">
-    <h2>단서 보드</h2>
-    <div class="cork" id="cork">
-      <svg class="threads" id="threads" aria-hidden="true"></svg>
-    </div>
+    <h2 class="cap">단서 보드</h2>
+    <div class="cork" id="cork"><svg class="threads" id="threads" aria-hidden="true"></svg></div>
     <div class="foot">
       <span class="hint">관련된 단서는 붉은 실로 이어져요</span>
-      <button class="btn btn-red" id="showBtn">추리쇼 미리보기</button>
+      <button class="btn btn-red" id="showBtn">추리쇼 시작</button>
     </div>
   </section>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-
-<div class="show" id="show" hidden role="dialog" aria-modal="true" aria-label="추리쇼">
-  <div class="show-inner" id="showInner"></div>
-  <div class="show-ctrl">
-    <button class="btn" id="showNext">다음 ▸</button>
-    <button class="btn" id="showClose">닫기</button>
-  </div>
-</div>
+<div class="show" id="show" hidden role="dialog" aria-modal="true" aria-label="추리쇼"><div class="sw" id="sw"></div></div>
 
 <script>
 (function(){
-/* ---------- 아이콘 (단서 사진 대용) ---------- */
-const G = {
-  watch:'<circle cx="24" cy="24" r="12"/><path d="M24 24V16M24 24l6 3M20 6h8v6h-8zM20 36h8v6h-8z"/>',
-  crown:'<circle cx="22" cy="24" r="12"/><path d="M22 24V16M22 24l6 3M34 22h8v4h-8z"/>',
-  ladder:'<path d="M16 6v36M32 6v36M16 12h16M16 20h16M16 28h16M16 36h16"/>',
-  wound:'<rect x="15" y="15" width="18" height="18" transform="rotate(12 24 24)"/><path d="M10 40c6-4 22-4 28 0" stroke-dasharray="3 3"/>',
-  bookend:'<path d="M10 40h28M14 40V12h9v28"/><path d="M30 40V22" stroke-dasharray="3 3"/>',
-  fire:'<path d="M8 40h32M12 40V18h24v22"/><path d="M24 36c-5-1-6-6-3-10 0 3 2 4 2 1 3 2 5 8 1 9z"/>',
-  speaker:'<rect x="15" y="7" width="18" height="34" rx="3"/><circle cx="24" cy="29" r="6"/><circle cx="24" cy="15" r="2"/><path d="M38 18c3 4 3 8 0 12M42 14c5 6 5 14 0 20"/>',
-  monitor:'<rect x="7" y="9" width="34" height="23" rx="1"/><path d="M24 32v6M15 39h18M12 16h14M12 21h20M12 26h10"/>',
-  phone:'<rect x="15" y="5" width="18" height="38" rx="3"/><path d="M19 13h10M19 18h7"/><circle cx="31" cy="11" r="3" fill="currentColor"/>',
-  letter:'<rect x="7" y="12" width="34" height="24"/><path d="M7 12l17 14 17-14"/>'
-};
-const glyph = k => `<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${G[k]}</svg>`;
-
-/* ---------- 단서 ---------- */
-const CLUES = {
-  C01:{t:'물증',n:'멈춘 손목시계',d:'유리가 깨진 채 22:31에 멈춰 있다.',g:'watch'},
-  C02:{t:'관찰',n:'당겨진 용두',d:'용두가 시간 조정 위치로 빠져 있다. 넘어진 충격으로는 이렇게 되지 않는다.',g:'crown'},
-  C03:{t:'관찰',n:'먼지 쌓인 사다리',d:'발판에 먼지가 그대로다. 발자국이 하나도 없다.',g:'ladder'},
-  C04:{t:'관찰',n:'사각형 상처',d:'후두부에 각진 모서리 자국. 둥근 사다리 봉과는 모양이 맞지 않는다.',g:'wound'},
-  C05:{t:'물증',n:'짝 잃은 북엔드',d:'청동 북엔드 한 쌍 중 하나가 없다.',g:'bookend'},
-  C06:{t:'관찰',n:'꺼진 벽난로',d:'불이 꺼져 있다. 옆 장작 상자는 가득 차 있다.',g:'fire'},
-  C07:{t:'관찰',n:'최대 볼륨 스피커',d:'평소 꺼 두던 스마트 스피커가 최대 볼륨으로 올라가 있다.',g:'speaker'},
-  C08:{t:'기록',n:'스마트홈 예약 기록',d:'"22:30 재생: memo_0912.m4a / 예약 생성 21:51"',g:'monitor'},
-  C09:{t:'기록',n:'읽지 않은 메시지',d:'21:50 윤채아의 메시지가 읽지 않음 상태. 마지막 사용 21:41.',g:'phone'},
-  C10:{t:'기록',n:'협박장',d:'"15년 전 「겨울 해바라기」의 진짜 주인을 기억하라"',g:'letter'},
-  S01:{note:1,by:'강태오',n:'그날 밤 행적',d:'"9시 반부터 10시 직전까지 샤워했죠. 그 뒤론 계속 보드게임."'},
-  S02:{note:1,by:'오순자',n:'10시의 장작',d:'"주인어른은 매일 밤 10시 정각에 장작을 넣으세요. 하루도 안 빼먹고요."'},
-  S03:{note:1,by:'오순자',n:'22:30의 목소리',d:'"그때 저희 조용히 게임하고 있었는데… \'시끄럽다\'라니요?"'},
-  S06:{note:1,by:'윤채아',n:'PC 비밀번호',d:'"선생님 PC요? 비밀번호는 제가 관리해요. 열어 드릴게요."'}
-};
-const LINKS = [['C06','S02'],['C03','C04'],['C01','C02'],['C07','S03'],['C07','C08'],['C05','C04']];
-
-/* ---------- 인물 초상 (평면 벡터) ---------- */
-const P = {
-  minjae:{name:'서민재',role:'조카 · 29',bg:'#b9c3d4',skin:'#f0cfb4',hair:'#2b2622',cloth:'#5a6e8c',style:'messy'},
-  chaea:{name:'윤채아',role:'비서 · 34',bg:'#d7c3c0',skin:'#f3d6c2',hair:'#3a2a26',cloth:'#2f3440',style:'bob',glasses:1},
-  taeo:{name:'강태오',role:'미술 평론가 · 45',bg:'#c8ccb6',skin:'#e7c3a3',hair:'#4a4642',cloth:'#6b4a3a',style:'slick',glasses:0,beard:1},
-  sunja:{name:'오순자',role:'가정부 · 58',bg:'#d6cfb2',skin:'#efcdb0',hair:'#8e8a86',cloth:'#7a8c6a',style:'bun'}
-};
-function portrait(p, ex){
-  ex = ex || 'calm';
-  const hair = {
-    messy:'<path d="M28 42c-2-16 10-25 22-25s25 8 22 25c-3-6-6-9-9-10 1 3 0 5-2 6-2-4-6-7-11-7-3 3-8 6-14 6-3 1-6 3-8 5z"/>',
-    bob:'<path d="M26 48c-3-20 8-31 24-31s27 11 24 31l-2 12c-3-2-4-6-4-12-1-9-6-14-12-17-6 4-15 6-22 6-1 7-1 15-3 23l-3-12z"/>',
-    slick:'<path d="M29 40c0-15 10-22 22-22 13 0 21 8 20 22-3-8-9-12-17-12-9 0-16 4-25 12z"/>',
-    bun:'<circle cx="50" cy="15" r="9"/><path d="M28 44c-2-16 9-24 22-24s24 8 22 24c-4-9-12-13-22-13s-18 4-22 13z"/>'
-  }[p.style];
-  const brow = {calm:'M38 39h8M54 39h8',shaken:'M38 37l8-2M54 35l8 2',angry:'M38 36l8 4M54 40l8-4'}[ex];
-  const eyes = ex==='shaken'
-    ? '<circle cx="42" cy="46" r="3.2" fill="#fff" stroke="#23262d" stroke-width="1.6"/><circle cx="58" cy="46" r="3.2" fill="#fff" stroke="#23262d" stroke-width="1.6"/><circle cx="42" cy="46" r="1.1" fill="#23262d"/><circle cx="58" cy="46" r="1.1" fill="#23262d"/>'
-    : '<path d="M39 46h6M55 46h6" stroke="#23262d" stroke-width="2.6" stroke-linecap="round"/>';
-  const mouth = {calm:'M45 59q5 3 10 0',shaken:'M46 60q4-4 8 0q-4 3-8 0',angry:'M44 61q6-4 12 0'}[ex];
-  return `<svg viewBox="0 0 100 100" aria-hidden="true">
-    <rect width="100" height="100" fill="${p.bg}"/>
-    <path d="M8 100c3-20 18-28 42-28s39 8 42 28z" fill="${p.cloth}"/>
-    <path d="M40 76l10 10 10-10" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="2"/>
-    <rect x="43" y="60" width="14" height="16" fill="${p.skin}"/>
-    <ellipse cx="50" cy="46" rx="20" ry="23" fill="${p.skin}"/>
-    ${p.beard?'<path d="M34 54c2 12 9 16 16 16s14-4 16-16c-4 5-9 7-16 7s-12-2-16-7z" fill="'+p.hair+'" opacity=".85"/>':''}
-    <g fill="${p.hair}">${hair}</g>
-    <path d="${brow}" stroke="${p.hair}" stroke-width="2.6" stroke-linecap="round" fill="none"/>
-    ${eyes}
-    ${p.glasses?'<g fill="none" stroke="#23262d" stroke-width="1.6"><rect x="35" y="41" width="13" height="10" rx="3"/><rect x="52" y="41" width="13" height="10" rx="3"/><path d="M48 45h4"/></g>':''}
-    <path d="M50 49l-2 6h3" fill="none" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>
-    <path d="${mouth}" stroke="#23262d" stroke-width="2.2" fill="none" stroke-linecap="round"/>
-    ${ex==='shaken'?'<path d="M70 34q3 5 0 8q-3-3 0-8z" fill="#8fc3e8"/>':''}
-    ${ex==='angry'?'<path d="M68 28l4 3-4 3M74 26l4 4-4 4" stroke="'+'#c4372d'+'" stroke-width="2.2" fill="none"/>':''}
-  </svg>`;
-}
-
-/* ---------- 심문 데이터 ---------- */
-const TALK = {
-  minjae:{intro:'"저, 저는 방에 있었어요! 큰아버지 일이랑은 아무 상관 없다고요."',
-    topics:[{l:'22:30에 어디 있었나',a:'"방이요. 방에 있었다니까요… 왜 자꾸 물어보세요?"',ex:'shaken'}],
-    react:{C05:{a:'"북엔드요? 서재 물건엔 손 안 대요. 큰아버지가 질색하셨거든요."',ex:'calm'}},
-    def:'"그게 저랑 무슨 상관인데요?"'},
-  chaea:{intro:'"선생님 일정은 전부 제가 관리했어요. 필요한 게 있으면 말씀하세요."',
-    topics:[{l:'서재 PC',a:CLUES.S06.d,get:'S06',unlock:1,ex:'calm'}],
-    react:{C09:{a:'"…그 메시지, 제가 보낸 거 맞아요. 하지만 답장은 끝내 안 오셨어요."',ex:'shaken'}},
-    def:'"죄송하지만 그건 잘 모르겠네요."'},
-  taeo:{intro:'"진혁이와는 30년 지기입니다. 이런 일이 생기다니… 믿기지가 않는군요."',
-    topics:[{l:'그날 밤 행적',a:CLUES.S01.d,get:'S01',ex:'calm'}],
-    react:{C05:{a:'"북엔드요? 원래 하나만 있었던 거 아닙니까. 그런 사소한 걸 다 기억하진 못하죠."',ex:'calm'},
-           C10:{a:'"…「겨울 해바라기」. 진혁이 대표 소장품이죠. 그게 왜요?"',ex:'angry'}},
-    def:'"탐정님, 그건 사건과 관계없어 보이는데요."'},
-  sunja:{intro:'"20년을 이 집에서 일했어요. 주인어른 습관이라면 뭐든 물어보세요."',
-    topics:[{l:'주인어른의 밤 습관',a:CLUES.S02.d,get:'S02',ex:'calm'},
-            {l:'22:30에 들린 목소리',a:CLUES.S03.d,get:'S03',ex:'shaken'}],
-    react:{C06:{a:'"장작이 그대로라고요? 그럴 리가… 10시엔 꼭 넣으시는데. 그럼 그때 이미…"',ex:'shaken'}},
-    def:'"글쎄요, 그건 처음 보는 물건이네요."'}
-};
-
-/* ---------- 현장 핫스팟 ---------- */
-const SPOTS = [
-  {id:'body',x:150,y:150,l:'시신',clues:['C04']},
-  {id:'wrist',x:205,y:182,l:'손목',clues:['C01','C02']},
-  {id:'ladder',x:100,y:76,l:'사다리',clues:['C03']},
-  {id:'shelf',x:318,y:42,l:'서가',clues:['C05']},
-  {id:'fire',x:532,y:132,l:'벽난로',clues:['C06']},
-  {id:'speaker',x:500,y:350,l:'스피커',clues:['C07']},
-  {id:'pc',x:470,y:192,l:'PC',clues:['C08'],lock:1},
-  {id:'phone',x:404,y:212,l:'휴대폰',clues:['C09']},
-  {id:'drawer',x:392,y:252,l:'서랍',clues:['C10']}
-];
-
-/* ---------- 상태 ---------- */
-const S = {got:[], view:'scene', who:null, ex:'calm', line:'', fresh:null, newLine:false, pc:false};
-const has = id => S.got.includes(id);
 const $ = s => document.querySelector(s);
 
-function gain(id){
-  if(has(id)) return false;
-  S.got.push(id); S.fresh = id;
-  toast(`단서 획득: ${CLUES[id].n}`);
-  return true;
+/* ================= 인물 초상 ================= */
+const P = {
+  minjae:{name:'서민재',role:'조카 · 29',bg:'#aeb9cc',skin:'#f1d0b5',sh:'#d9a98a',hair:'#231f1d',hl:'#4a423c',iris:'#3a2a20',style:'messy',outfit:'hoodie',cloth:'#4b5f80'},
+  chaea:{name:'윤채아',role:'비서 · 34',bg:'#d3bfbd',skin:'#f4d8c4',sh:'#dfb096',hair:'#2e2120',hl:'#5a3f3a',iris:'#2a1c18',style:'bob',outfit:'blazer',cloth:'#2c3140',glasses:1,lip:'#b5524c'},
+  taeo:{name:'강태오',role:'미술 평론가 · 45',bg:'#c3c7b0',skin:'#e6c09e',sh:'#c99a77',hair:'#3a3632',hl:'#a9a39b',iris:'#2b2420',style:'slick',outfit:'turtle',cloth:'#6a4a39',beard:1},
+  sunja:{name:'오순자',role:'가정부 · 58',bg:'#d4ccad',skin:'#eecdaf',sh:'#d3a685',hair:'#8b8580',hl:'#bdb8b2',iris:'#3a2c22',style:'bun',outfit:'apron',cloth:'#71855f',wrinkle:1}
+};
+function eye(cx, cy, ex, p, flip){
+  const d = flip ? -1 : 1, ink = '#1e1a18';
+  if(ex==='down') return `<path d="M${cx-6} ${cy+1} Q${cx} ${cy+4.5} ${cx+6} ${cy+1}" stroke="${ink}" stroke-width="1.8" fill="none" stroke-linecap="round"/>`;
+  const w = ex==='shaken' ? 7 : 6.5, h = ex==='shaken' ? 6 : 4.6, ir = ex==='shaken' ? 2.1 : 3.1;
+  let s = `<path d="M${cx-w} ${cy} Q${cx} ${cy-h} ${cx+w} ${cy} Q${cx} ${cy+h*.75} ${cx-w} ${cy}Z" fill="#fbf8f3"/>
+    <circle cx="${cx+(ex==='angry'?d*.6:0)}" cy="${cy+.3}" r="${ir}" fill="${p.iris}"/>
+    <circle cx="${cx+(ex==='angry'?d*.6:0)}" cy="${cy+.3}" r="${ir*.45}" fill="#0d0b0a"/>
+    <circle cx="${cx+1}" cy="${cy-1}" r=".9" fill="#fff"/>`;
+  if(ex==='angry') s += `<path d="M${cx-w-1} ${cy-7} L${cx+w+1} ${cy-7} L${cx+w+1} ${d>0?cy-.5:cy-3} L${cx-w-1} ${d>0?cy-3:cy-.5}Z" fill="${p.skin}"/>`;
+  s += `<path d="M${cx-w-.5} ${cy+(ex==='angry'?(d>0?-2.5:-.5):-.2)} Q${cx} ${cy-(ex==='angry'?1.8:h+.6)} ${cx+w+.5} ${cy+(ex==='angry'?(d>0?-.5:-2.5):-.4)}" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+  return s;
 }
-let tt;
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800)}
-
-/* ---------- 렌더 ---------- */
-const PLACES = [
-  {n:'서재',s:'현장'},{n:'거실',s:''},{n:'정원',s:''},{n:'보일러실',s:'잠김',lock:1},{n:'수장고',s:'잠김',lock:1}
-];
-function renderSide(){
-  $('#places').innerHTML = PLACES.map((p,i)=>
-    `<button class="tab${p.lock?' locked':''}" data-place="${i}" aria-current="${i===0&&S.view==='scene'}">${p.n}<small>${p.s}</small></button>`).join('');
-  $('#people').innerHTML = Object.entries(P).map(([k,p])=>
-    `<button class="person" data-who="${k}" aria-current="${S.view==='talk'&&S.who===k}">
-       <div class="ph">${portrait(p)}</div><span>${p.name}</span><small>${p.role}</small></button>`).join('');
-}
-
-function planSVG(){
-  const spots = SPOTS.map(s=>{
-    const done = s.clues.every(has), locked = s.lock && !S.pc;
-    return `<g class="hot${done?' done':''}${locked?' lock':''}" data-spot="${s.id}" tabindex="0" role="button" aria-label="${s.l} 조사${locked?' (잠김)':''}">
-      <circle class="ring" cx="${s.x}" cy="${s.y}" r="10"/><circle class="dot" cx="${s.x}" cy="${s.y}" r="7"/>
-      <text x="${s.x+12}" y="${s.y+5}">${s.l}${locked?' 🔒':''}</text></g>`;
-  }).join('');
-  return `<svg class="plan" viewBox="0 0 600 400" role="img" aria-label="서재 평면도">
-    <rect class="wall" x="20" y="20" width="560" height="360"/>
-    <path d="M250 380h80" stroke="#0f1520" stroke-width="8"/><path class="thin" d="M250 380a80 80 0 0 1 80-80"/>
-    <path d="M20 170v100" stroke="#8fb3d9" stroke-width="6"/>
-    <text class="label" x="30" y="292">창문 (폭설)</text>
-    <rect class="fur" x="60" y="26" width="320" height="28"/>
-    ${Array.from({length:30},(_,i)=>`<path class="thin" d="M${66+i*10.5} 30v20" opacity=".5"/>`).join('')}
-    <g class="thin"><path d="M88 56v40M114 56v40M88 66h26M88 76h26M88 86h26"/></g>
-    <path class="body-outline" d="M120 130c10-8 30-6 36 4l40 18c10 4 16 14 10 22l-30 2-40 8c-14 2-24-4-26-14l-6-22c-2-8 6-14 16-18z"/>
-    <rect class="fur" x="360" y="170" width="150" height="90"/>
-    <rect class="fur" x="455" y="178" width="34" height="24"/>
-    <rect class="fur" x="370" y="240" width="44" height="16"/>
-    <rect class="fur" x="396" y="203" width="14" height="22"/>
-    <circle class="fur" cx="435" cy="285" r="16"/>
-    <rect class="fire" x="548" y="92" width="30" height="80"/>
-    <rect class="fur" x="516" y="100" width="22" height="30"/>
-    <text class="label" x="508" y="152">장작</text>
-    <rect class="fur" x="470" y="336" width="80" height="30"/>
-    <text class="label" x="378" y="164">책상</text>
-    <text class="label" x="232" y="76">서가</text>
-    <text class="label" x="268" y="372">문</text>
-    ${spots}
+function portrait(k, ex){
+  const p = P[k]; ex = ex || 'calm';
+  const ink = '#1e1a18';
+  const brows = {
+    calm:['M42 51 Q49 48 55 50','M65 50 Q71 48 78 51'],
+    shaken:['M42 49 Q49 45 55 46','M65 46 Q71 45 78 49'],
+    angry:['M42 47 L55 52','M65 52 L78 47'],
+    down:['M42 51 Q49 50 55 47','M65 47 Q71 50 78 51']
+  }[ex];
+  const mouth = {
+    calm:`<path d="M54 80 Q60 82.5 66 80" stroke="${p.lip||'#8a4a3c'}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    shaken:`<ellipse cx="60" cy="81" rx="3.2" ry="3" fill="#5a2622"/>`,
+    angry:`<path d="M53 82 Q60 77.5 67 82" stroke="#5a2622" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M55 81 L65 81" stroke="#fff" stroke-width="1.2" opacity=".8"/>`,
+    down:`<path d="M55 82 Q60 80 65 82" stroke="#8a4a3c" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
+  }[ex];
+  const hairBack = {
+    bob:`<path d="M31 90 C27 70 27 46 34 34 C40 23 50 18 60 18 C70 18 80 23 86 34 C93 46 93 70 89 90 C85 94 79 93 77 89 L78 60 L42 60 L43 89 C41 93 35 94 31 90Z" fill="${p.hair}"/>`,
+    bun:`<circle cx="60" cy="19" r="11" fill="${p.hair}"/><path d="M53 15 Q60 11 67 15" stroke="${p.hl}" stroke-width="2" fill="none"/>`
+  }[p.style]||'';
+  const hairFront = {
+    messy:`<path d="M34 58 C30 36 42 20 60 20 C80 20 91 34 86 58 C84 50 82 47 79 44 L80 52 C76 46 72 42 68 40 L69 48 C65 44 60 41 54 41 L56 48 C50 44 45 43 41 45 L42 52 C39 53 36 55 34 58Z" fill="${p.hair}"/>
+      <path d="M44 29 Q55 23 68 27" stroke="${p.hl}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M71 30 Q76 33 79 38" stroke="${p.hl}" stroke-width="2" fill="none" stroke-linecap="round"/>`,
+    bob:`<path d="M35 55 C33 36 44 24 60 24 C76 24 87 36 85 55 C81 46 75 40 67 37 C62 44 52 46 44 44 C40 46 37 50 35 55Z" fill="${p.hair}"/>
+      <path d="M48 29 Q58 25 70 29" stroke="${p.hl}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`,
+    slick:`<path d="M35 53 C33 32 46 21 62 21 C78 21 87 32 85 51 C83 42 77 36 68 34 C58 32 46 36 40 44 C38 46 36 49 35 53Z" fill="${p.hair}"/>
+      <path d="M47 28 Q60 22 76 28" stroke="${p.hl}" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M44 35 Q56 29 70 31" stroke="${p.hl}" stroke-width="1.6" fill="none" opacity=".7"/>`,
+    bun:`<path d="M35 56 C33 36 45 25 60 25 C75 25 87 36 85 56 C82 44 74 37 60 37 C46 37 38 44 35 56Z" fill="${p.hair}"/>
+      <path d="M60 26 L60 37" stroke="#5f5a55" stroke-width="1.4"/><path d="M45 32 Q52 28 58 28" stroke="${p.hl}" stroke-width="2" fill="none"/>`
+  }[p.style];
+  const outfit = {
+    hoodie:`<path d="M37 104 Q60 122 83 104 Q77 97 70 100 L60 110 L50 100 Q43 97 37 104Z" fill="#3a4a66"/>
+      <path d="M54 110 L53 128 M66 110 L67 128" stroke="#e8e8ea" stroke-width="2" stroke-linecap="round"/>`,
+    blazer:`<path d="M50 99 L60 118 L70 99Z" fill="#f4f2ee"/><path d="M50 99 L44 140 L36 140 L40 108Z M70 99 L76 140 L84 140 L80 108Z" fill="#232733"/>
+      <path d="M50 99 L56 112 M70 99 L64 112" stroke="#d9d6cf" stroke-width="1.2"/>`,
+    turtle:`<path d="M49 90 L49 106 Q60 112 71 106 L71 90Z" fill="#2a2a30"/><path d="M49 96 Q60 101 71 96 M49 101 Q60 106 71 101" stroke="#3b3b44" stroke-width="1.2" fill="none"/>
+      <path d="M47 104 L40 140 L32 140 L36 112Z M73 104 L80 140 L88 140 L84 112Z" fill="#553a2c"/>`,
+    apron:`<path d="M46 112 L74 112 L80 140 L40 140Z" fill="#eee8dc"/><path d="M46 112 L50 100 M74 112 L70 100" stroke="#eee8dc" stroke-width="3"/>
+      <path d="M50 101 L60 108 L70 101" stroke="#5e704f" stroke-width="2" fill="none"/>`
+  }[p.outfit];
+  return `<svg viewBox="0 0 120 140" aria-hidden="true">
+    <rect width="120" height="140" fill="${p.bg}"/>
+    <circle cx="60" cy="58" r="52" fill="#fff" opacity=".18"/>
+    <path d="M0 132 H120" stroke="#000" opacity=".06" stroke-width="16"/>
+    ${hairBack}
+    <path d="M8 140 C10 116 28 104 50 100 L60 108 L70 100 C92 104 110 116 112 140Z" fill="${p.cloth}"/>
+    <path d="M60 108 L70 100 C92 104 110 116 112 140 L64 140Z" fill="#000" opacity=".14"/>
+    <path d="M51 84 L51 102 Q60 108 69 102 L69 84Z" fill="${p.skin}"/>
+    <path d="M51 88 Q60 99 69 88 L69 96 Q60 104 51 96Z" fill="${p.sh}" opacity=".8"/>
+    ${outfit}
+    <ellipse cx="35.5" cy="61" rx="4.5" ry="7.5" fill="${p.skin}"/><ellipse cx="84.5" cy="61" rx="4.5" ry="7.5" fill="${p.sh}"/>
+    <path d="M36 56 C36 36 46 26 60 26 C74 26 84 36 84 56 C84 70 80 80 72 87 C67 91 63 93 60 93 C57 93 53 91 48 87 C40 80 36 70 36 56Z" fill="${p.skin}"/>
+    <path d="M72 34 C82 42 85 56 83 68 C81 78 74 87 64 92 C72 82 76 70 76 58 C76 48 75 40 72 34Z" fill="${p.sh}" opacity=".55"/>
+    ${p.beard?`<path d="M40 72 C42 85 50 94 60 94 C70 94 78 85 80 72 C76 79 71 81 67 80 Q60 76.5 53 80 C49 81 44 79 40 72Z" fill="${p.hair}" opacity=".88"/><path d="M53 76.5 Q60 73.5 67 76.5 Q60 78.5 53 76.5Z" fill="${p.hair}"/>`:''}
+    <ellipse cx="45" cy="71" rx="4.5" ry="2.2" fill="#e5897a" opacity="${ex==='shaken'?.15:.28}"/><ellipse cx="75" cy="71" rx="4.5" ry="2.2" fill="#e5897a" opacity="${ex==='shaken'?.15:.28}"/>
+    ${eye(49,61,ex,p,false)}${eye(71,61,ex,p,true)}
+    <path d="${brows[0]}" stroke="${p.hair}" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="${brows[1]}" stroke="${p.hair}" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+    <path d="M61 63 L58.5 72.5 Q60.5 74 63 73" stroke="${p.sh}" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+    ${p.wrinkle?`<path d="M40 64 l-3.5 1.5 M80 64 l3.5 1.5 M52 75 Q49.5 78.5 51.5 81 M68 75 Q70.5 78.5 68.5 81" stroke="${p.sh}" stroke-width="1.2" fill="none"/>`:''}
+    ${mouth}
+    ${hairFront}
+    ${p.glasses?`<g fill="rgba(255,255,255,.12)" stroke="#1e1a18" stroke-width="1.7"><rect x="40" y="54.5" width="17" height="13" rx="4"/><rect x="63" y="54.5" width="17" height="13" rx="4"/></g><path d="M57 59 Q60 57.5 63 59" stroke="#1e1a18" stroke-width="1.5" fill="none"/><path d="M43 64 L49 57 M66 64 L72 57" stroke="#fff" stroke-width="1.4" opacity=".55"/>`:''}
+    ${ex==='shaken'?`<path d="M88 40 q4 7 0 10 q-4 -3 0 -10z" fill="#9fd0f0" stroke="#5c8fb3" stroke-width=".8"/>`:''}
+    ${ex==='angry'?`<path d="M80 30 l5 -2 l-1 5 m3 -6 l5 -2 l-1 5" stroke="#c4372d" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:''}
+    ${ex==='down'?`<g stroke="#2a2440" stroke-width="1.3" opacity=".4">${[42,47,52,57,62,67,72,77].map(x=>`<path d="M${x} 32 V${44+((x*7)%9)}"/>`).join('')}</g>`:''}
   </svg>`;
 }
 
+/* ================= 증거 사진 일러스트 ================= */
+function hand(cx,cy,deg,len){const r=(deg-90)*Math.PI/180;return `${cx+Math.cos(r)*len} ${cy+Math.sin(r)*len}`}
+const ILL = {
+  C01:()=>{let t='';for(let i=0;i<12;i++)t+=`<path d="M${hand(80,60,i*30,21)} L${hand(80,60,i*30,24)}" stroke="#3a3530" stroke-width="${i%3?1.2:2.4}"/>`;
+    return `<rect x="68" y="-2" width="24" height="124" rx="3" fill="#5a3b2a"/><path d="M72 0 V120" stroke="#7a553d" stroke-width="1.5"/>
+    <circle cx="80" cy="60" r="32" fill="#a88a4c"/><circle cx="80" cy="60" r="32" fill="none" stroke="#e8d29a" stroke-width="2"/>
+    <rect x="110" y="55" width="8" height="10" rx="1.5" fill="#c4a663"/>
+    <circle cx="80" cy="60" r="26" fill="#efe9dc"/>${t}
+    <path d="M80 60 L${hand(80,60,315.5,13)}" stroke="#1d1a17" stroke-width="3" stroke-linecap="round"/>
+    <path d="M80 60 L${hand(80,60,186,20)}" stroke="#1d1a17" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="80" cy="60" r="2.3" fill="#1d1a17"/>
+    <path d="M60 44 L76 57 L68 76 M76 57 L93 50 L101 65 M76 57 L85 82 M93 50 L96 38" stroke="#fff" stroke-width="1.1" fill="none" opacity=".9"/>
+    <path d="M56 36 Q64 30 74 30" stroke="#fff" stroke-width="3" opacity=".35" fill="none" stroke-linecap="round"/>`},
+  C02:()=>`<circle cx="34" cy="60" r="46" fill="#a88a4c"/><circle cx="34" cy="60" r="38" fill="#efe9dc"/>
+    <path d="M34 60 L${hand(34,60,315.5,18)}" stroke="#1d1a17" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="79" y="55" width="26" height="10" fill="#8f7440"/><rect x="105" y="46" width="15" height="28" rx="3" fill="#c9ab68"/>
+    ${[108,111,114,117].map(x=>`<path d="M${x} 48 V72" stroke="#8f7440" stroke-width="1"/>`).join('')}
+    <path d="M84 88 H124" stroke="#ff5a4d" stroke-width="2" stroke-dasharray="4 3"/><path d="M118 84 L124 88 L118 92" stroke="#ff5a4d" stroke-width="2" fill="none"/>
+    <text x="86" y="104" fill="#ff7a6f" font-size="10" font-family="Nanum Gothic Coding,monospace" font-weight="700">당겨진 용두</text>`,
+  C03:()=>{let r='';[.12,.3,.48,.66,.84].forEach(t=>{const y=118-114*t;r+=`<path d="M${48+22*t} ${y} L${98+14*t} ${y}" stroke="#a8723f" stroke-width="6"/><path d="M${48+22*t} ${y-2.5} L${98+14*t} ${y-2.5}" stroke="#d9d3c4" stroke-width="2" opacity=".8" stroke-dasharray="1 2"/>`});
+    return `<path d="M48 120 L72 2" stroke="#7d4f2c" stroke-width="8"/><path d="M98 120 L114 2" stroke="#7d4f2c" stroke-width="8"/>${r}
+    <ellipse cx="85" cy="66" rx="30" ry="10" fill="none" stroke="#ff5a4d" stroke-width="2" stroke-dasharray="5 3"/>
+    <text x="104" y="112" fill="#ff7a6f" font-size="10" font-family="Nanum Gothic Coding,monospace" font-weight="700">발자국 없음</text>`},
+  C04:()=>{let tk='';for(let i=0;i<=10;i++)tk+=`<path d="M${30+i*10} 98 V${i%5?104:108}" stroke="#3a3530" stroke-width="1"/>`;
+    return `<circle cx="80" cy="50" r="36" fill="#2c3341" stroke="#8c96a8" stroke-width="1.5"/>
+    ${[0,1,2,3,4,5,6].map(i=>`<path d="M${52+i*9} 22 Q${54+i*9} 50 ${50+i*9} 78" stroke="#4a5366" stroke-width="1.2" fill="none"/>`).join('')}
+    <rect x="72" y="30" width="16" height="16" transform="rotate(12 80 38)" fill="rgba(255,90,77,.25)" stroke="#ff5a4d" stroke-width="2.4"/>
+    <path d="M72 34 L46 20" stroke="#ff7a6f" stroke-width="1.2"/><text x="6" y="17" fill="#ff7a6f" font-size="9.5" font-family="Nanum Gothic Coding,monospace">각진 자국</text>
+    <rect x="28" y="94" width="104" height="16" fill="#e8dcb5"/>${tk}
+    <text x="122" y="108" fill="#3a3530" font-size="7" font-family="Nanum Gothic Coding,monospace">cm</text>`},
+  C05:()=>`<rect x="0" y="94" width="160" height="12" fill="#5e3f27"/><rect x="0" y="94" width="160" height="2" fill="#8a6440"/>
+    ${[[34,'#7c2f2a',62],[46,'#2f4a6b',70],[59,'#3f5a3a',58],[70,'#8a6b2f',66],[82,'#4b3b5e',72],[95,'#6b2f3f',64]].map(([x,c,h])=>`<rect x="${x}" y="${94-h}" width="${x===95?14:12}" height="${h}" fill="${c}"/><path d="M${x+2} ${98-h} H${x+10}" stroke="#d8c9a0" stroke-width="1" opacity=".6"/>`).join('')}
+    <path d="M110 94 V40 H124 V94Z" fill="#9c7a3c"/><path d="M110 94 H140 V86 H124 V94Z" fill="#7d5f2c"/><path d="M113 44 V90" stroke="#e8cf8a" stroke-width="2" opacity=".7"/>
+    <path d="M14 94 V40 H28 V94 M14 94 H-4" stroke="#ff5a4d" stroke-width="2" stroke-dasharray="4 3" fill="none"/>
+    <text x="14" y="34" fill="#ff7a6f" font-size="14" font-family="Black Han Sans,sans-serif">?</text>`,
+  C06:()=>`<rect x="14" y="16" width="100" height="98" fill="#5f5b55"/>${[24,40,56,72,88].map(y=>`<path d="M14 ${y} H114" stroke="#4a4642" stroke-width="1.2"/>`).join('')}
+    <rect x="8" y="10" width="112" height="10" fill="#6e6a63"/>
+    <path d="M32 114 V64 Q64 34 96 64 V114Z" fill="#0f0f10"/>
+    <ellipse cx="64" cy="108" rx="24" ry="5" fill="#77726b"/><rect x="48" y="100" width="30" height="6" rx="3" fill="#2a2522" transform="rotate(-6 63 103)"/>
+    <path d="M58 92 Q62 84 58 76" stroke="#9aa3b2" stroke-width="1.4" fill="none" opacity=".35"/>
+    <rect x="122" y="70" width="34" height="44" fill="#6b4a2f"/><rect x="122" y="70" width="34" height="5" fill="#86603e"/>
+    ${[[131,84],[147,84],[139,96],[131,106],[147,106]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="7" fill="#b07a47"/><circle cx="${x}" cy="${y}" r="3.5" fill="none" stroke="#7a5230" stroke-width="1"/>`).join('')}
+    <text x="122" y="64" fill="#f0c25a" font-size="9.5" font-family="Nanum Gothic Coding,monospace" font-weight="700">가득 참</text>`,
+  C07:()=>`<rect x="52" y="26" width="46" height="80" rx="10" fill="#2b3039"/><ellipse cx="75" cy="26" rx="23" ry="7" fill="#454c59"/>
+    <ellipse cx="75" cy="26" rx="18" ry="5" fill="none" stroke="#f0c25a" stroke-width="3"/><ellipse cx="75" cy="26" rx="22" ry="8" fill="none" stroke="#f0c25a" stroke-width="1" opacity=".4"/>
+    ${[0,1,2,3,4,5,6].map(i=>`<path d="M58 ${48+i*7} H92" stroke="#3a404c" stroke-width="2.5"/>`).join('')}
+    ${[0,1,2,3,4].map(i=>`<rect x="${110+i*9}" y="${88-i*12}" width="6" height="${12+i*12}" fill="#f0c25a"/>`).join('')}
+    <text x="111" y="100" fill="#f0c25a" font-size="10" font-family="Nanum Gothic Coding,monospace" font-weight="700">VOL MAX</text>`,
+  C08:()=>`<rect x="18" y="10" width="124" height="80" rx="4" fill="#1a1f27" stroke="#4a5160"/><rect x="24" y="16" width="112" height="68" fill="#0d2433"/>
+    <rect x="72" y="90" width="16" height="14" fill="#2a2f38"/><rect x="56" y="104" width="48" height="5" rx="2" fill="#2a2f38"/>
+    <g font-family="Nanum Gothic Coding,monospace" font-size="8.5"><text x="30" y="30" fill="#7fb6d6">스마트홈 · 예약 재생</text>
+    <text x="30" y="47" fill="#e6f0f6">▶ 22:30  memo_0912.m4a</text><rect x="28" y="56" width="74" height="13" fill="#f0c25a" opacity=".9"/>
+    <text x="31" y="66" fill="#10161d" font-weight="700">예약 생성 21:51</text><text x="30" y="79" fill="#7fb6d6">기기: 서재 스피커</text></g>`,
+  C09:()=>`<rect x="52" y="4" width="56" height="112" rx="9" fill="#1d2129"/><rect x="56" y="14" width="48" height="92" rx="2" fill="#e9edf2"/>
+    <g font-family="Nanum Gothic Coding,monospace"><text x="60" y="24" fill="#5a6270" font-size="6.5">윤채아</text>
+    <rect x="60" y="34" width="40" height="24" rx="5" fill="#d2e2f5"/><text x="63" y="44" fill="#1f2a38" font-size="6.2">오늘 밤 꼭</text><text x="63" y="53" fill="#1f2a38" font-size="6.2">얘기해요.</text>
+    <text x="60" y="68" fill="#5a6270" font-size="6">21:50</text><text x="76" y="68" fill="#d4473a" font-size="6.2" font-weight="700">읽지 않음</text>
+    <text x="60" y="98" fill="#8a919c" font-size="5.6">마지막 사용 21:41</text></g>`,
+  C10:()=>`<g transform="rotate(-5 80 60)"><rect x="32" y="8" width="96" height="104" fill="#efe9da"/>
+    ${[['15년 전',40,30,'#7c2f2a',13],['「겨울 해바라기」의',38,52,'#1d1d1d',10],['진짜 주인을',46,72,'#2f4a6b',12],['기억하라',52,94,'#1d1d1d',14]].map(([t,x,y,c,s])=>`<text x="${x}" y="${y}" fill="${c}" font-size="${s}" font-family="Black Han Sans,sans-serif">${t}</text>`).join('')}</g>`,
+  C11:()=>`<rect x="20" y="8" width="120" height="104" fill="#efe9da"/>
+    <g font-family="Nanum Gothic Coding,monospace" font-size="7.5" fill="#2a2a2a"><text x="26" y="22" font-weight="700">온수 사용 기록 · 11/08</text>
+    <path d="M24 28 H136 M24 46 H136 M24 64 H136 M24 82 H136 M24 100 H136" stroke="#9b9384" stroke-width=".8"/>
+    <text x="28" y="40">1F 주방</text><text x="88" y="40">21:10–21:25</text>
+    <rect x="24" y="47" width="112" height="16" fill="#f2d24a" opacity=".75"/>
+    <text x="28" y="58" font-weight="700">2F 손님방B</text><text x="88" y="58" font-weight="700">21:56–21:58</text>
+    <text x="28" y="76">2F 손님방A</text><text x="88" y="76">—</text><text x="28" y="94">2F 안방</text><text x="88" y="94">22:40–22:52</text></g>
+    <ellipse cx="112" cy="55" rx="28" ry="12" fill="none" stroke="#d4473a" stroke-width="1.8"/>`,
+  C12:()=>`<rect x="0" y="0" width="160" height="70" fill="#1a2232"/>
+    <rect x="58" y="4" width="44" height="34" fill="#f0d79a" opacity=".85"/><path d="M80 4 V38 M58 21 H102" stroke="#1a2232" stroke-width="3"/>
+    <path d="M0 78 Q40 58 80 70 T160 66 V120 H0Z" fill="#e8eef6"/><path d="M0 92 Q50 80 90 90 T160 86 V120 H0Z" fill="#cfd9e8"/>
+    <ellipse cx="80" cy="82" rx="20" ry="7" fill="#9fb0c8"/>
+    <g transform="rotate(-24 80 74)"><path d="M72 84 V52 H84 V84Z" fill="#9c7a3c"/><path d="M75 56 V82" stroke="#e8cf8a" stroke-width="1.6" opacity=".7"/>
+    <path d="M73 58 q3 3 1 7" stroke="#6e1a14" stroke-width="3" fill="none" stroke-linecap="round"/></g>
+    <text x="106" y="52" fill="#f0c25a" font-size="8.5" font-family="Nanum Gothic Coding,monospace">강태오의 방 창문</text>`,
+  C13:()=>{let pt='';for(let i=0;i<14;i++)pt+=`<ellipse cx="80" cy="44" rx="4" ry="11" fill="#e8b830" transform="rotate(${i*25.7} 80 56)"/>`;
+    return `<rect x="26" y="4" width="108" height="112" fill="#5a3c25"/><rect x="34" y="12" width="92" height="96" fill="#1f2f4a"/>
+    ${[[44,22],[110,30],[52,84],[100,90],[118,70]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.4" fill="#dfe8f5"/>`).join('')}
+    <path d="M80 64 Q78 86 82 106" stroke="#4d6b3a" stroke-width="3" fill="none"/>${pt}<circle cx="80" cy="56" r="9" fill="#5a3a1a"/>
+    <text x="100" y="102" fill="#e8e2d0" font-size="7" font-family="Noto Serif KR,serif" font-style="italic">J.H.</text>
+    <text x="102" y="94" fill="#9fe7ff" font-size="7" font-family="Noto Serif KR,serif" opacity=".7">K.S.</text>
+    <circle cx="108" cy="94" r="10" fill="none" stroke="#ff5a4d" stroke-width="1.6" stroke-dasharray="3 2"/>`}
+};
+const photo = (id, small) => `<div class="photo"><svg viewBox="0 0 160 120" aria-hidden="true">${ILL[id]()}</svg>${small?'':`<span class="tp">${CLUES[id].t}</span>`}<span class="evno">증거 ${id.slice(1)}</span></div>`;
+
+/* ================= 단서 ================= */
+const CLUES = {
+  C01:{t:'물증',n:'멈춘 손목시계',d:'유리가 깨진 채 22:31에 멈춰 있다.'},
+  C02:{t:'관찰',n:'당겨진 용두',d:'용두가 시간 조정 위치로 빠져 있다. 넘어진 충격으로는 이렇게 되지 않는다.'},
+  C03:{t:'관찰',n:'먼지 쌓인 사다리',d:'발판에 먼지가 그대로다. 발자국이 하나도 없다.'},
+  C04:{t:'관찰',n:'사각형 상처',d:'후두부에 각진 모서리 자국. 둥근 사다리 봉과는 모양이 맞지 않는다.'},
+  C05:{t:'물증',n:'짝 잃은 북엔드',d:'청동 북엔드 한 쌍 중 하나가 없다.'},
+  C06:{t:'관찰',n:'꺼진 벽난로',d:'불이 꺼져 있다. 옆 장작 상자는 가득 차 있다.'},
+  C07:{t:'관찰',n:'최대 볼륨 스피커',d:'평소 꺼 두던 스마트 스피커가 최대 볼륨이다.'},
+  C08:{t:'기록',n:'스마트홈 예약 기록',d:'22:30 재생 예약. 예약을 만든 시각은 21:51.'},
+  C09:{t:'기록',n:'읽지 않은 메시지',d:'21:50 메시지가 읽지 않음. 마지막 사용 21:41.'},
+  C10:{t:'기록',n:'협박장',d:'"15년 전 「겨울 해바라기」의 진짜 주인을 기억하라"'},
+  C11:{t:'기록',n:'온수 사용 기록',d:'2층 손님방B(강태오) 온수 사용은 21:56~21:58, 단 2분.'},
+  C12:{t:'물증',n:'눈 속의 북엔드',d:'강태오의 방 창문 아래 눈 더미. 주변에 발자국이 없다.'},
+  C13:{t:'물증',n:'「겨울 해바라기」',d:'서명 아래로 덧칠된 이니셜 K.S.가 비친다.'},
+  S01:{note:1,by:'강태오',n:'그날 밤 행적',d:'"9시 반부터 10시 직전까지 샤워했죠. 그 뒤론 계속 보드게임."'},
+  S02:{note:1,by:'오순자',n:'10시의 장작',d:'"주인어른은 매일 밤 10시 정각에 장작을 넣으세요. 하루도 안 빼먹고요."'},
+  S03:{note:1,by:'오순자',n:'22:30의 목소리',d:'"그때 저희 조용히 게임하고 있었는데… 시끄럽다니요?"'},
+  S06:{note:1,by:'윤채아',n:'PC 비밀번호',d:'"선생님 PC 비밀번호는 제가 관리해요. 열어 드릴게요."'},
+  S07:{note:1,by:'오순자',n:'K.S.',d:'"K.S.라면… 강 선생님 여동생, 세린 씨예요. 그림 그리던 분."'}
+};
+const LINKS = [['C06','S02'],['C03','C04'],['C01','C02'],['C07','S03'],['C07','C08'],['C05','C04'],['C06','C09']];
+
+/* ================= 심문 ================= */
+const TALK = {
+  minjae:{intro:'저, 저는 방에 있었어요! 큰아버지 일이랑은 아무 상관 없다고요.',
+    topics:[{l:'22:30에 어디 있었나',a:'방이요. 방에 있었다니까요… 왜 자꾸 물어보세요?',ex:'shaken'}],
+    react:{C05:{a:'북엔드요? 서재 물건엔 손 안 대요. 큰아버지가 질색하셨거든요.',ex:'calm'}},
+    def:'그게 저랑 무슨 상관인데요?'},
+  chaea:{intro:'선생님 일정은 전부 제가 관리했어요. 필요한 게 있으면 말씀하세요.',
+    topics:[{l:'서재 PC',a:CLUES.S06.d.slice(1,-1),get:'S06',unlock:1,ex:'calm'}],
+    react:{C09:{a:'…그 메시지, 제가 보낸 거 맞아요. 하지만 답장은 끝내 오지 않았어요.',ex:'shaken'}},
+    def:'죄송하지만 그건 잘 모르겠네요.'},
+  taeo:{intro:'진혁이와는 30년 지기입니다. 이런 일이 생기다니… 믿기지가 않는군요.',
+    topics:[{l:'그날 밤 행적',a:CLUES.S01.d.slice(1,-1),get:'S01',ex:'calm'}],
+    react:{C05:{a:'북엔드요? 원래 하나만 있었던 거 아닙니까. 그런 사소한 걸 다 기억하진 못하죠.',ex:'calm'},
+           C10:{a:'…「겨울 해바라기」. 진혁이 대표 소장품이죠. 그게 왜요?',ex:'angry'}},
+    def:'탐정님, 그건 사건과 관계없어 보이는데요.'},
+  sunja:{intro:'20년을 이 집에서 일했어요. 주인어른 습관이라면 뭐든 물어보세요.',
+    topics:[{l:'주인어른의 밤 습관',a:CLUES.S02.d.slice(1,-1),get:'S02',ex:'calm'},
+            {l:'22:30에 들린 목소리',a:CLUES.S03.d.slice(1,-1),get:'S03',ex:'shaken'}],
+    react:{C06:{a:'장작이 그대로라고요? 그럴 리가… 10시엔 꼭 넣으시는데. 그럼 그때 이미…',ex:'shaken'}},
+    def:'글쎄요, 그건 처음 보는 물건이네요.'}
+};
+
+/* ================= 현장 ================= */
+const SPOTS = [
+  {id:'body',x:206,y:146,l:'시신',clues:['C04']},
+  {id:'wrist',x:262,y:220,l:'손목',clues:['C01','C02']},
+  {id:'ladder',x:136,y:120,l:'사다리',clues:['C03']},
+  {id:'shelf',x:372,y:96,l:'서가',clues:['C05']},
+  {id:'fire',x:528,y:140,l:'벽난로',clues:['C06']},
+  {id:'pc',x:528,y:186,l:'PC',clues:['C08'],lock:1},
+  {id:'phone',x:440,y:186,l:'휴대폰',clues:['C09']},
+  {id:'drawer',x:432,y:300,l:'서랍',clues:['C10']},
+  {id:'speaker',x:540,y:332,l:'스피커',clues:['C07']}
+];
+const PLACES = [{n:'서재',s:'현장'},{n:'거실',s:''},{n:'정원',s:''},{n:'보일러실',s:'잠김',lock:1},{n:'수장고',s:'잠김',lock:1}];
+
+const S = {got:[], view:'scene', who:null, ex:'calm', line:'', fresh:null, newLine:false, pc:false};
+const has = id => S.got.includes(id);
+function gain(id){ if(has(id)) return false; S.got.push(id); S.fresh=id; toast(`단서 획득 · ${CLUES[id].n}`); return true; }
+let tt; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1900)}
+
+function renderSide(){
+  $('#places').innerHTML = PLACES.map((p,i)=>`<button class="tab${p.lock?' locked':''}" data-place="${i}" aria-current="${i===0&&S.view==='scene'}">${p.n}<small>${p.s}</small></button>`).join('');
+  $('#people').innerHTML = Object.entries(P).map(([k,p])=>`<button class="person" data-who="${k}" aria-current="${S.view==='talk'&&S.who===k}">
+    <div class="ph">${portrait(k)}</div><span>${p.name}</span><small>${p.role}</small></button>`).join('');
+}
+function planSVG(){
+  const mk = SPOTS.map((s,i)=>{const done=s.clues.every(has), lock=s.lock&&!S.pc;
+    return `<g class="mk${done?' done':''}${lock?' lock':''}" data-spot="${s.id}" tabindex="0" role="button" aria-label="${i+1}번 ${s.l} 조사${lock?' (잠김)':''}${done?' (완료)':''}" transform="translate(${s.x} ${s.y})">
+      <circle class="halo" cx="0" cy="0" r="12"/><path class="tent" d="M-11 9 L-7 -11 H7 L11 9Z"/><text class="num" x="0" y="4">${lock?'✕':done?'✓':i+1}</text>
+      <text class="tag" x="15" y="4">${s.l}</text></g>`}).join('');
+  let books=''; for(let x=74;x<396;x+=9) books+=`<path d="M${x} 46 V${64+((x*13)%7)}" class="soft"/>`;
+  return `<svg class="plan" viewBox="0 0 640 450" role="img" aria-label="서재 현장 도면">
+    <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0 V6" stroke="#232831" stroke-width="1.6"/></pattern></defs>
+    ${Array.from({length:20},(_,i)=>`<path d="M44 ${62+i*17} H596" stroke="#232831" stroke-width=".5" opacity=".12"/>`).join('')}
+    <path d="M30 30 H610 V400 H30Z M42 42 V388 H598 V42Z" fill="url(#hatch)" fill-rule="evenodd" stroke="#232831" stroke-width="1.6"/>
+    <rect x="270" y="386" width="72" height="16" fill="#ece6d6"/><path class="ink" d="M270 388 V320 A68 68 0 0 1 338 388"/><path class="ink" d="M270 388 H276 M336 388 H342"/>
+    <rect x="28" y="190" width="16" height="92" fill="#ece6d6"/><path class="ink" d="M30 190 V282 M36 190 V282 M42 190 V282"/>
+    <rect class="fill" x="70" y="42" width="330" height="28"/>${books}
+    <g><rect class="fill" x="122" y="72" width="28" height="56"/><path class="ink" d="M122 82 H150 M122 92 H150 M122 102 H150 M122 112 H150 M122 122 H150"/></g>
+    <rect x="150" y="150" width="210" height="150" fill="none" stroke="#232831" stroke-width="1" stroke-dasharray="2 3"/><rect class="soft" x="160" y="160" width="190" height="130"/>
+    <path class="tape" d="M182 124 a15 15 0 1 1 1 30 l40 10 l44 -12 l6 12 l-36 14 l36 24 l-6 10 l-46 -22 l-28 6 l-8 14 l-12 -6 l8 -16 l-16 -12 l8 -10 l8 -16 a15 15 0 0 1 1 -16z"/>
+    <rect class="fill" x="400" y="196" width="168" height="84"/><rect class="fill" x="508" y="204" width="44" height="26"/><path class="ink" d="M530 230 V238"/>
+    <rect class="fill" x="432" y="204" width="14" height="24" rx="2"/><rect class="fill" x="410" y="262" width="52" height="14"/>
+    <circle class="fill" cx="486" cy="300" r="17"/>
+    <rect class="fill" x="210" y="316" width="54" height="50" rx="8"/><rect class="soft" x="218" y="324" width="38" height="34" rx="4"/>
+    <rect x="572" y="96" width="26" height="94" fill="url(#hatch)" stroke="#232831" stroke-width="1.6"/><rect class="fill" x="548" y="110" width="24" height="66"/>
+    <rect class="fill" x="548" y="196" width="0" height="0"/>
+    <rect class="fill" x="500" y="346" width="94" height="36"/><circle class="fill" cx="560" cy="364" r="9"/>
+    <text class="lab" x="470" y="272">책상</text><text class="lab" x="52" y="300">창문 · 폭설</text>
+    <text class="lab" x="292" y="378">출입문</text><text class="lab" x="226" y="380">안락의자</text>
+    <text class="lab" x="164" y="314">러그</text><text class="lab" x="508" y="368" font-size="10">AV장</text>
+    <g transform="translate(578 68)"><circle class="soft" r="14"/><path d="M0 -12 L4 2 L0 -1 L-4 2Z" fill="#232831"/><text class="lab" x="-4" y="-18">N</text></g>
+    <text class="lab-b" x="34" y="430">현장 도면 · 설월장 1층 서재</text><text class="lab" x="250" y="430">축척 1:50 · 작성 23:40 · 담당 탐정</text>
+    <text class="lab" x="490" y="430" fill="#c4372d">테이프 = 시신 위치</text>
+    ${mk}
+  </svg>`;
+}
 function renderMain(){
-  const m = $('#main');
+  const m=$('#main');
   if(S.view==='scene'){
-    m.innerHTML = `<div class="main-head"><h2>현장 · 서재</h2><span class="hint">빛나는 지점을 눌러 조사하세요</span></div>
-      <div class="plan-wrap">${planSVG()}</div>`;
+    m.innerHTML=`<div class="main-head"><h2>현장 · 서재</h2><span class="hint">노란 증거 표지판을 눌러 조사하세요</span></div><div class="sheet paper">${planSVG()}</div>`;
     return;
   }
-  const p = P[S.who], t = TALK[S.who];
-  const ev = S.got.filter(id=>!CLUES[id].note);
-  m.innerHTML = `<div class="main-head"><h2>심문</h2><button class="btn" data-back>◂ 현장으로</button></div>
-    <div class="interro">
-      <div class="big-ph" id="bigph">${portrait(p,S.ex)}</div>
-      <div class="talk">
-        <div class="who">${p.name}<small>${p.role}</small></div>
-        <div class="bubble${S.newLine?' new':''}">${S.line||t.intro}</div>
-        <div class="row-label">질문하기</div>
-        <div class="chips">${t.topics.map((q,i)=>`<button class="chip" data-topic="${i}">${q.l}</button>`).join('')}</div>
-        <div class="row-label">단서 제시</div>
-        <div class="chips">${ev.length?ev.map(id=>`<button class="chip ev" data-ev="${id}">${CLUES[id].n}</button>`).join(''):'<span class="empty">아직 제시할 물증이 없어요. 현장을 먼저 조사해 보세요.</span>'}</div>
-      </div>
-    </div>`;
+  const p=P[S.who], t=TALK[S.who], ev=S.got.filter(id=>!CLUES[id].note);
+  m.innerHTML=`<div class="main-head"><h2>심문</h2><button class="btn" data-back>◂ 현장으로</button></div>
+   <div class="interro">
+     <div class="idcard paper" id="idcard"><div class="pic">${portrait(S.who,S.ex)}</div><div class="nm">${p.name}</div><div class="rl">${p.role}</div></div>
+     <div class="talk">
+       <div class="bubble paper${S.newLine?' new':''}"><span class="speaker">${p.name}</span>“${S.line||t.intro}”</div>
+       <div class="row-label">질문하기</div>
+       <div class="chips">${t.topics.map((q,i)=>`<button class="chip" data-topic="${i}">${q.l}</button>`).join('')}</div>
+       <div class="row-label">단서 제시</div>
+       <div class="chips">${ev.length?ev.map(id=>`<button class="chip ev" data-ev="${id}">${CLUES[id].n}</button>`).join(''):'<span class="empty">아직 제시할 물증이 없어요. 현장을 먼저 조사해 보세요.</span>'}</div>
+     </div>
+   </div>`;
 }
-
-const rot = id => { let h=0; for(const c of id) h=(h*31+c.charCodeAt(0))%997; return ((h%9)-4)*0.9; };
-function cardHTML(id, extra){
-  const c = CLUES[id];
+const rot=id=>{let h=0;for(const c of id)h=(h*31+c.charCodeAt(0))%997;return((h%9)-4)*.9};
+function cardHTML(id,extra){
+  const c=CLUES[id];
   if(c.note) return `<article class="card note${extra||''}" data-card="${id}" style="--r:${rot(id)}deg"><h3>${c.n}</h3><p>${c.d}</p><span class="by">진술 · ${c.by}</span></article>`;
-  return `<article class="card${extra||''}" data-card="${id}" style="--r:${rot(id)}deg">
-    <div class="photo">${glyph(c.g)}<span class="id">${id}</span><span class="tp">${c.t}</span></div>
-    <h3>${c.n}</h3><p>${c.d}</p></article>`;
+  return `<article class="card${extra||''}" data-card="${id}" style="--r:${rot(id)}deg">${photo(id)}<h3>${c.n}</h3><p>${c.d}</p></article>`;
 }
 function renderBoard(){
-  const cork = $('#cork');
-  cork.querySelectorAll('.card,.cork-empty').forEach(n=>n.remove());
-  if(!S.got.length){cork.insertAdjacentHTML('beforeend','<div class="cork-empty">아직 아무것도 붙어 있지 않아요</div>')}
-  S.got.forEach(id=>cork.insertAdjacentHTML('beforeend', cardHTML(id, id===S.fresh?' fresh':'')));
-  $('#cnt').textContent = S.got.length;
-  S.fresh = null;
-  requestAnimationFrame(drawThreads);
+  const cork=$('#cork'); cork.querySelectorAll('.card,.cork-empty').forEach(n=>n.remove());
+  if(!S.got.length) cork.insertAdjacentHTML('beforeend','<div class="cork-empty">아직 아무것도 붙어 있지 않아요</div>');
+  S.got.forEach(id=>cork.insertAdjacentHTML('beforeend',cardHTML(id,id===S.fresh?' fresh':'')));
+  $('#cnt').textContent=S.got.length; S.fresh=null;
+  requestAnimationFrame(drawThreads); setTimeout(drawThreads,520);
 }
 function drawThreads(){
-  const cork=$('#cork'), svg=$('#threads'), b=cork.getBoundingClientRect();
-  const pt = id => { const el=cork.querySelector(`[data-card="${id}"]`); if(!el) return null;
-    const r=el.getBoundingClientRect(); return [r.left-b.left+r.width/2, r.top-b.top+2]; };
+  const cork=$('#cork'),svg=$('#threads'),b=cork.getBoundingClientRect();
+  const pt=id=>{const el=cork.querySelector(`[data-card="${id}"]`);if(!el)return null;const r=el.getBoundingClientRect();return[r.left-b.left+r.width/2,r.top-b.top+1]};
   svg.setAttribute('viewBox',`0 0 ${b.width} ${b.height}`);
-  svg.innerHTML = LINKS.map(([a,c])=>{const p=pt(a),q=pt(c); return p&&q?`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}"/>`:''}).join('');
+  svg.innerHTML=LINKS.map(([a,c])=>{const p=pt(a),q=pt(c);if(!p||!q)return'';const mx=(p[0]+q[0])/2,my=Math.max(p[1],q[1])+26;return`<path d="M${p[0]} ${p[1]} Q${mx} ${my} ${q[0]} ${q[1]}"/>`}).join('');
 }
 function render(){renderSide();renderMain();renderBoard()}
 
-/* ---------- 이벤트 ---------- */
 function investigate(id){
-  const s = SPOTS.find(x=>x.id===id);
-  if(s.lock && !S.pc){toast('비밀번호가 걸려 있다. 아는 사람이 있을지도…');return}
-  const next = s.clues.find(c=>!has(c));
-  if(!next){toast('더 이상 찾을 것은 없어 보인다.');return}
-  gain(next); render();
+  const s=SPOTS.find(x=>x.id===id);
+  if(s.lock&&!S.pc){toast('비밀번호가 걸려 있다. 아는 사람이 있을지도…');return}
+  const n=s.clues.find(c=>!has(c));
+  if(!n){toast('더 이상 찾을 것은 없어 보인다.');return}
+  gain(n); render();
 }
-function shakePortrait(){const b=$('#bigph'); if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}}
+function shakeId(){const b=$('#idcard');if(b){b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}}
+
+/* ================= 추리쇼 ================= */
+const ALL_EV = ['C01','C02','C03','C04','C05','C06','C07','C08','C09','C10','C11','C12','C13','S01','S02','S03','S07'];
+const STEPS = [
+  {type:'say',punch:'범인은 이 안에 있습니다.',text:'모두 거실에 모여 주셔서 감사합니다. 서진혁 씨의 죽음에 대해, 지금부터 제 추리를 말씀드리죠.'},
+  {type:'ev',who:'minjae',ex:'shaken',line:'범인이라니요? 큰아버지는 사다리에서 떨어지신 거잖아요!',q:'사고가 아니라는 증거를 제시하라',ok:['C03','C04'],
+    punch:'이건 사고가 아닙니다!',text:'사다리 발판의 먼지는 그대로였고, 상처는 각진 모서리에 맞은 자국이었습니다. 피해자는 사다리에 오르지 않았어요. 누군가 뒤에서 내리친 겁니다.',
+    no:'그게 사고가 아니라는 증거가 돼요? 전혀 모르겠는데요.'},
+  {type:'ev',who:'taeo',ex:'calm',line:'흥미롭군요. 하지만 22시 30분에 우린 모두 진혁이 목소리를 들었습니다. 그 시각 나는 거실에서 오 여사님과 함께였고요.',q:'22:30의 목소리가 피해자가 아니었다는 증거',ok:['C08'],
+    punch:'그 목소리는 녹음이었습니다!',text:'서재 PC에 기록이 남아 있었습니다. 22시 30분 스피커 재생 예약. 그리고 그 예약을 만든 시각은 21시 51분이었죠.',
+    no:'그걸로 그 목소리가 가짜였다고 할 수 있습니까? 다들 똑똑히 들었는데요.'},
+  {type:'ev',who:'chaea',ex:'shaken',line:'잠깐만요. 목소리가 녹음이었다고 해도, 선생님이 언제 돌아가셨는지는 모르는 거잖아요?',q:'실제 사망 시각을 밝히는 증거',ok:['C06','S02','C09'],
+    punch:'피해자는 10시 전에 이미 숨져 있었습니다!',text:'매일 밤 10시 정각에 꼭 넣던 장작이 그날만은 그대로였습니다. 휴대폰도 21시 41분 이후로 아무도 만지지 않았고요.',
+    no:'그게 시간이랑 무슨 상관이죠? 설명이 안 되잖아요.'},
+  {type:'say',punch:'21시 40분, 그 자리에 없던 사람.',text:'범행 시각에 거실에 없었고, 피해자의 육성 녹음을 손에 넣을 수 있었던 사람. 그 조건에 맞는 사람은 단 한 명입니다.'},
+  {type:'accuse',ok:'taeo'},
+  {type:'ev',who:'taeo',ex:'angry',line:'…나는 그 시간에 샤워를 하고 있었다고 말씀드렸을 텐데요. 증거라도 있습니까?',q:'샤워했다는 진술을 무너뜨릴 증거',ok:['C11'],
+    punch:'샤워는 단 2분이었습니다!',text:'보일러 기록에 따르면 당신 방의 온수 사용은 21시 56분부터 58분까지. 30분 동안 샤워했다는 건 거짓말입니다. 범행 후 피를 씻어낸 2분이었죠.',
+    no:'하하, 그게 무슨 증거입니까. 탐정님도 꽤 초조하신 모양이군요.'},
+  {type:'ev',who:'taeo',ex:'angry',line:'2분이든 30분이든! 흉기는 어디 있습니까? 흉기도 없이 사람을 범인으로 몰 생각입니까?',q:'흉기의 행방',ok:['C12'],
+    punch:'흉기는 당신 방 창문 아래 있었습니다!',text:'정원의 눈 더미 속, 바로 당신 방 창문 아래에서 청동 북엔드가 나왔습니다. 주변엔 발자국 하나 없었죠. 위에서 던졌다는 뜻입니다.',
+    no:'그게 흉기라고요? 웃기지도 않는군.'},
+  {type:'ev',who:'taeo',ex:'angry',line:'…왜 내가 30년 친구를 죽여야 합니까. 이유가 없잖아요!',q:'범행 동기를 밝히는 증거',ok:['C13','S07'],
+    punch:'15년 전, 한 장의 그림입니다.',text:'「겨울 해바라기」의 서명 아래에는 K.S.라는 이니셜이 숨어 있었습니다. 강세린. 15년 전 그림을 빼앗긴 화가, 당신의 여동생이죠.',
+    no:'그게 나와 무슨 관계가 있다는 겁니까.'},
+  {type:'confess',who:'taeo',line:'…세린이는 그 뒤로 다시는 붓을 잡지 못했어. 그 그림 앞에서 웃던 진혁이 얼굴을… 15년 동안 하루도 잊은 적이 없다.'},
+  {type:'end'}
+];
+const WRONG = {
+  minjae:'저요? 전 녹음 파일 같은 거 만들 줄도 몰라요! 큰아버지 인터뷰 녹음을 제가 어디서 구해요?',
+  chaea:'저는 21시 50분에 선생님께 메시지를 보냈어요. 이미 돌아가신 분께 메시지를 보내는 범인이 어디 있나요?',
+  sunja:'저는 9시 반부터 주방에서 설거지를 하고, 10시부터는 거실에 있었어요. 강 선생님이랑 같이요.'
+};
+const SH = {i:0, hearts:5, sel:null, solved:false, wrongMsg:'', accused:null, mode:'run'};
+const lens='<svg viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5" fill="none" stroke="#f0c25a" stroke-width="2.6"/><path d="M15 15 L21 21" stroke="#f0c25a" stroke-width="3" stroke-linecap="round"/></svg>';
+
+function showShell(inner, hot){
+  const st=STEPS[SH.i], total=STEPS.length-1, speaking=st.who||null;
+  const lu=Object.keys(P).map(k=>`<div class="lu${k===speaking||(st.type==='accuse')?' on':''}${SH.accused===k?' accused':''}"><div class="f">${portrait(k, k===speaking?(SH.solved&&st.type==='ev'?'shaken':(st.ex||'calm')):'calm')}</div><span>${P[k].name}</span></div>`).join('');
+  $('#show').classList.toggle('hot',!!hot);
+  $('#sw').innerHTML=`<div class="s-top"><span>추리쇼 · 설월장 거실 · <b>${Math.min(SH.i+1,total)} / ${total}</b></span>
+     <span class="hearts" aria-label="추리력 ${SH.hearts} / 5">추리력 ${[0,1,2,3,4].map(n=>`<span class="${n<SH.hearts?'':'off'}">${lens}</span>`).join('')}</span>
+     <button class="btn" data-sh="close">나가기</button></div>
+   ${st.type==='accuse'&&SH.mode==='run'?'':`<div class="lineup">${lu}</div>`}${inner}`;
+}
+function renderShow(fx){
+  const st=STEPS[SH.i];
+  if(SH.mode==='fail') return showShell(`<div class="ending">
+     <div class="obj" style="text-align:left"><div class="f">${portrait('taeo','calm')}</div><div class="say paper"><span class="speaker">강태오</span>“증거가 그것뿐이라면 이만 실례하겠습니다. 날이 밝으면 산을 내려가야 해서요.”</div></div>
+     <div class="punch">범인이 빠져나갔다</div><p>추리력이 바닥났습니다. 단서를 더 모아서 다시 도전하세요.</p>
+     <button class="btn btn-red" data-sh="restart">처음부터 다시</button></div>`);
+  if(SH.mode==='wrong') return showShell(`<div class="ending">
+     <div class="obj" style="text-align:left"><div class="f shake">${portrait(SH.accused,'angry')}</div><div class="say paper"><span class="speaker">${P[SH.accused].name}</span>“${WRONG[SH.accused]}”</div></div>
+     <div class="punch in">잘못된 지목</div><p>추리의 앞뒤가 맞지 않습니다. 추리력이 1 줄었습니다.</p>
+     <button class="btn btn-red" data-sh="reaccuse">다시 지목한다</button></div>`);
+  if(st.type==='say') return showShell(`<div class="stage"><div class="det"><div class="who">탐정</div><h2 class="punch in">${st.punch}</h2><p>${st.text}</p></div></div>
+     <div class="act-row"><button class="btn btn-red" data-sh="next">계속 ▸</button></div>`, true);
+  if(st.type==='accuse') return showShell(`<div class="stage"><div class="det"><div class="who">탐정</div><h2 class="punch in">범인은 바로 —</h2><p>범인이라고 생각하는 사람을 지목하세요. 되돌릴 수 없습니다.</p></div>
+     <div class="accuse">${Object.keys(P).map(k=>`<button class="ac" data-acc="${k}"><div class="f">${portrait(k,'calm')}</div><b>${P[k].name}</b><small>${P[k].role}</small></button>`).join('')}</div></div>`, true);
+  if(st.type==='confess') return showShell(`<div class="stage"><div class="obj"><div class="f">${portrait(st.who,'down')}</div><div class="say paper"><span class="speaker">${P[st.who].name}</span>“${st.line}”</div></div></div>
+     <div class="act-row"><button class="btn btn-red" data-sh="next">사건 종결 ▸</button></div>`);
+  if(st.type==='end'){
+    const g=SH.hearts>=5?'S':SH.hearts>=4?'A':SH.hearts>=3?'B':'C';
+    return showShell(`<div class="ending"><div class="grade">${g}</div><div class="punch" style="font-size:clamp(28px,5vw,48px)">사건 종결</div>
+      <dl class="sum paper"><dt>범인</dt><dd>강태오 (미술 평론가)</dd><dt>수단</dt><dd>청동 북엔드로 가격한 뒤 사다리 추락 사고로 위장</dd>
+      <dt>트릭</dt><dd>녹음된 목소리를 22:30에 예약 재생해 사망 시각을 늦춰 보이게 함</dd><dt>동기</dt><dd>15년 전 여동생 강세린의 그림을 빼앗긴 데 대한 복수</dd>
+      <dt>추리력</dt><dd>${SH.hearts} / 5</dd></dl>
+      <button class="btn btn-red" data-sh="restart">처음부터 다시</button></div>`);
+  }
+  /* ev */
+  if(SH.solved) return showShell(`<div class="stage"><div class="proof"><div><div class="who" style="font-family:var(--f-mono);font-size:12px;letter-spacing:.2em;color:var(--lamp)">탐정</div>
+     <h2 class="punch in">${st.punch}</h2><p style="color:var(--chalk);font-size:clamp(15px,1.8vw,18px);margin:0">${st.text}</p></div>
+     <div style="position:relative">${cardHTML(SH.sel,' slam')}<div class="seal">증명</div></div></div></div>
+     <div class="act-row"><button class="btn btn-red" data-sh="next">계속 ▸</button></div>`, true);
+  showShell(`<div class="stage"><div class="obj"><div class="f${SH.wrongMsg?' shake':''}">${portrait(st.who,SH.wrongMsg?'angry':st.ex)}</div>
+     <div class="say paper"><span class="speaker">${P[st.who].name}${SH.wrongMsg?' · 반론':''}</span>“${SH.wrongMsg||st.line}”</div></div></div>
+   <div class="act"><div class="act-q"><strong>${st.q}</strong><span>틀린 증거를 내면 추리력이 줄어요</span></div>
+     <div class="tray" role="listbox" aria-label="증거 목록">${ALL_EV.map(id=>{const c=CLUES[id];
+       return c.note?`<button class="ev note-ev" data-pick="${id}" aria-pressed="${SH.sel===id}"><div class="photo">“${c.by}”</div><b>${c.n}</b></button>`
+                    :`<button class="ev" data-pick="${id}" aria-pressed="${SH.sel===id}">${photo(id,1)}<b>${c.n}</b></button>`}).join('')}</div>
+     <div class="act-row"><button class="btn btn-red" data-sh="present" ${SH.sel?'':'disabled style="opacity:.45;cursor:not-allowed"'}>이 증거를 제시한다</button></div></div>`);
+  if(fx) quake();
+}
+function quake(){const w=$('#sw');w.classList.remove('shk');void w.offsetWidth;w.classList.add('shk')}
+function openShow(){SH.i=0;SH.hearts=5;SH.sel=null;SH.solved=false;SH.wrongMsg='';SH.accused=null;SH.mode='run';$('#show').hidden=false;document.body.style.overflow='hidden';renderShow();$('#show').scrollTop=0}
+function closeShow(){$('#show').hidden=true;document.body.style.overflow='';$('#showBtn').focus()}
+function nextStep(){SH.i++;SH.sel=null;SH.solved=false;SH.wrongMsg='';renderShow();$('#show').scrollTop=0}
+function lose(n){SH.hearts=Math.max(0,SH.hearts-n);if(SH.hearts===0)SH.mode='fail'}
 
 document.addEventListener('click',e=>{
-  const t=e.target.closest('[data-spot],[data-place],[data-who],[data-topic],[data-ev],[data-back]');
+  const t=e.target.closest('[data-spot],[data-place],[data-who],[data-topic],[data-ev],[data-back],[data-sh],[data-pick],[data-acc]');
   if(!t) return;
-  if(t.dataset.spot) investigate(t.dataset.spot);
-  else if(t.dataset.place!==undefined){
-    const p=PLACES[+t.dataset.place];
-    if(p.lock) toast(`${p.n}은(는) 잠겨 있다.`);
-    else if(+t.dataset.place!==0) toast('시안에서는 서재만 조사할 수 있어요.');
-    else {S.view='scene';render()}
-  }
-  else if(t.dataset.who){S.view='talk';S.who=t.dataset.who;S.ex='calm';S.line='';S.newLine=false;render()}
-  else if(t.dataset.topic!==undefined){
-    const q=TALK[S.who].topics[+t.dataset.topic];
-    S.line=q.a; S.ex=q.ex||'calm'; S.newLine=false;
-    if(q.get && gain(q.get)) S.newLine=true;
-    if(q.unlock && !S.pc){S.pc=true;setTimeout(()=>toast('서재 PC를 조사할 수 있게 됐다.'),1900)}
-    render(); if(S.ex!=='calm') shakePortrait();
-  }
-  else if(t.dataset.ev){
-    const r=TALK[S.who].react[t.dataset.ev];
-    S.line = r? r.a : TALK[S.who].def; S.ex = r? r.ex : 'calm'; S.newLine=false;
-    render(); if(r && r.ex!=='calm') shakePortrait();
-  }
+  const d=t.dataset;
+  if(d.spot) investigate(d.spot);
+  else if(d.place!==undefined){const p=PLACES[+d.place];
+    if(p.lock) toast(`${p.n}은(는) 잠겨 있다.`); else if(+d.place!==0) toast('시안에서는 서재만 조사할 수 있어요.'); else{S.view='scene';render()}}
+  else if(d.who){S.view='talk';S.who=d.who;S.ex='calm';S.line='';S.newLine=false;render()}
+  else if(d.topic!==undefined){const q=TALK[S.who].topics[+d.topic];S.line=q.a;S.ex=q.ex||'calm';S.newLine=false;
+    if(q.get&&gain(q.get))S.newLine=true;
+    if(q.unlock&&!S.pc){S.pc=true;setTimeout(()=>toast('서재 PC를 조사할 수 있게 됐다.'),2000)}
+    render();if(S.ex!=='calm')shakeId()}
+  else if(d.ev){const r=TALK[S.who].react[d.ev];S.line=r?r.a:TALK[S.who].def;S.ex=r?r.ex:'calm';S.newLine=false;render();if(r&&r.ex!=='calm')shakeId()}
   else if(t.hasAttribute('data-back')){S.view='scene';render()}
+  else if(d.pick){SH.sel=d.pick;const y=$('#show').scrollTop,x=$('.tray').scrollLeft;renderShow();$('.tray').scrollLeft=x;$('#show').scrollTop=y}
+  else if(d.acc){SH.accused=d.acc;
+    if(d.acc===STEPS[SH.i].ok){nextStep()} else {lose(1);if(SH.mode!=='fail')SH.mode='wrong';renderShow();quake()}}
+  else if(d.sh){
+    const st=STEPS[SH.i];
+    if(d.sh==='close') closeShow();
+    else if(d.sh==='next') nextStep();
+    else if(d.sh==='restart') openShow();
+    else if(d.sh==='reaccuse'){SH.mode='run';SH.accused=null;renderShow()}
+    else if(d.sh==='present'&&SH.sel){
+      if(st.ok.includes(SH.sel)){SH.solved=true;SH.wrongMsg='';renderShow();quake()}
+      else{lose(1);SH.wrongMsg=st.no;SH.sel=null;renderShow(true)}
+      $('#show').scrollTop=0;
+    }
+  }
 });
 document.addEventListener('keydown',e=>{
   const t=e.target.closest&&e.target.closest('[data-spot]');
-  if(t && (e.key==='Enter'||e.key===' ')){e.preventDefault();investigate(t.dataset.spot)}
-  if(e.key==='Escape' && !$('#show').hidden) closeShow();
+  if(t&&(e.key==='Enter'||e.key===' ')){e.preventDefault();investigate(t.dataset.spot)}
+  if(e.key==='Escape'&&!$('#show').hidden)closeShow();
 });
+$('#showBtn').onclick=openShow;
 addEventListener('resize',()=>requestAnimationFrame(drawThreads));
-if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>requestAnimationFrame(drawThreads));
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>requestAnimationFrame(drawThreads));
 
-/* ---------- 추리쇼 ---------- */
-const STEPS = [
-  {line:'이건 사고가 아닙니다.',sub:'사다리 발판에는 먼지가 그대로였어요. 피해자는 사다리에 오른 적이 없습니다.',clue:'C03'},
-  {line:'여러분이 들은 22시 30분의 목소리는…',sub:'피해자의 목소리가 아니었습니다. 누군가 미리 예약해 둔 녹음이었죠.',clue:'C07'},
-  {line:'진짜 범행 시각은 21시 40분 전후!',sub:'매일 밤 10시 정각에 넣던 장작이, 그날만은 그대로 남아 있었으니까요.',clue:'C06'}
-];
-let step=0;
-function drawStep(){
-  const s=STEPS[step], sh=$('#show');
-  $('#showInner').innerHTML = `<div><div class="show-step">추리 ${step+1} / ${STEPS.length}</div>
-    <h2 class="show-line">${s.line}</h2><p class="show-sub">${s.sub}</p></div>
-    <div>${cardHTML(s.clue,' slam')}</div>`;
-  $('#showNext').textContent = step<STEPS.length-1 ? '다음 ▸' : '처음부터';
-  sh.classList.remove('quake'); void sh.offsetWidth; sh.classList.add('quake');
-}
-function closeShow(){$('#show').hidden=true;$('#showBtn').focus()}
-$('#showBtn').onclick=()=>{step=0;$('#show').hidden=false;drawStep();$('#showNext').focus()};
-$('#showNext').onclick=()=>{step=(step+1)%STEPS.length;drawStep()};
-$('#showClose').onclick=closeShow;
-
-/* 시작 상태: 단서 몇 개를 미리 붙여 둔 진행 중 화면 */
-['C04','C03','C06','S02'].forEach(id=>S.got.push(id));
+['C04','C03','C06','S02','C07'].forEach(id=>S.got.push(id));
 render();
 })();
 </script>
